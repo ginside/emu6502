@@ -10,8 +10,10 @@
 
 int main(){
     mem_reset();
-    
-    loadTestingProgram(2);
+    int i = 1;
+    for(i; i<=3 ; i++) {
+		loadTestingProgram(i);
+	}
 
     // MAIN LOOP
 	//launchEmulation(Counter, opCode, debug);
@@ -21,93 +23,63 @@ int main(){
 
 void launchEmulation(int Counter, int opCode, int debug) {
     unsigned short memAdr;
-    
 	for(;;)
     {
         //OpCodeReading + pc incrementation, positionned at first operand (if there is one)
-
-
+		/*
+		if(opByteLength[opCode] == 0) {
+			printf("op code #%x cant have zero byte length..\n", opCode);
+			return;
+		}
+		
+		if(cycles[opCode] == 0) {
+			printf("op code #%x cant have zero cycles for execution time..\n", opCode);
+			return;
+		}*/
 
         opCode  =   Memory[pc];
         //Cycles decrementation to handle irqs
         ic      -=  cycles[opCode];
+        
 
-        printf("PC=%d | OPCODE=%x\n",pc,opCode);
-
+        printf("PC=%x | OPCODE=%x | IC=%x \n",pc,opCode,ic);
+		
 
         switch(opCode)
         {
-          case 0x00: opBRK(); break;//BRK 
-          case 0x1: opORA(adrIndexedIndirect()); break;//ORA (APZ,X) // ACC <- ACC v Mem[Operand1+X_reg]
-		  case 0x2: break; //NOP
-		  case 0x3: break; //NOP
-		  case 0x4: break; //NOP
-          case 0x5: opORA(adrZeroPage()); break;//ORA APZ // ACC <- ACC v Mem[Operand1]
-          case 0x6: mem_set(Memory[pc+1],opASL(adrZeroPage())); break;//ASL APZ
-		  case 0x7: break; //NOP
-          case 0x8: opPHP(); break; //PHP // STACK <- SR ; SP -= 1
-          case 0x9: opORA(adrImmediate()); break;//ORA #DON
-          case 0xa: acc = opASL(acc); break;//ASL ACC
-          case 0xb: break; //NOP
-          case 0xc: break; //NOP
-          case 0xd: opORA(adrAbsolute()); break; //ORA ADR
-          case 0xe: mem_set(concat_next_operands(), opASL(adrAbsolute())); break; //ASL ADR 
-          case 0xf: break; //NOP
-          case 0x10://BPL  
-            // IF NEGATIVE = 0: PC <- PC + OP1, if branch changes actual page, add 2 cycle, 1 elsewere
-            if((NEGATIVE & state_register) == 0){
-//                    memAt(Memory[pc+1]);
-                    memAdr = pc;
-//                    memAt(memAdr);
-                    if((Memory[pc+1] & 128) > 0)
-                     {
-
-//                        printf("-pc = 0x%x\n",pc);
-//                        printf("-mem invert = 0x%x\n",(Memory[pc+1]^0xff));
-                        pc = pc - (Memory[pc+1]^0xff) - 1;
-
-//                        printf("-pc = 0x%x\n",pc);
-                     }
-                    else
-                        pc = pc + Memory[pc+1];
-
-                    if((memAdr & 0xff00) != (pc & 0xff00))
-                        ic -= 2;
-                    else
-                        ic -= 1;
-//                    printf("pc = 0x%x\n",pc);
-                }
-                break;
-
-            case 0x11://ORA (APZ),Y
-                // printf("ORA:%x,%x:%x\n",Memory[Memory[pc+1] ],y_reg ,Memory[Memory[Memory[pc+1]]+y_reg]);
-                // ACC <- ACC v Mem[Mem[Operand1]+Y_reg]
-                acc  |= Memory[Memory[Memory[pc+1]]+y_reg];
-                stateReg_checkNZ(acc);
-                break;
+			case 0x00: opBRK(); break;//BRK 
+			case 0x01: opORA(adrIndexedIndirect()); break;//ORA (APZ,X) // ACC <- ACC v Mem[Operand1+X_reg]
+			case 0x02: break; //NOP
+			case 0x03: break; //NOP
+			case 0x04: break; //NOP
+			case 0x05: opORA(adrZeroPage(0, VALUE)); break;//ORA APZ // ACC <- ACC v Mem[Operand1]
+			case 0x06: mem_set(adrZeroPage(0, ADDRESS),opASL(adrZeroPage(0, VALUE))); break;//ASL APZ
+			case 0x07: break; //NOP
+			case 0x08: opPHP(); break; //PHP // STACK <- SR ; SP -= 1
+			case 0x09: opORA(adrImmediate()); break;//ORA #DON
+			case 0x0a: acc = opASL(acc); break;//ASL ACC
+			case 0x0b: break; //NOP
+			case 0x0c: break; //NOP
+			case 0x0d: opORA(adrAbsolute(0, VALUE)); break; //ORA ADR
+			case 0x0e: mem_set(adrAbsolute(0, ADDRESS), opASL(adrAbsolute(0, VALUE))); break; //ASL ADR 
+			case 0x0f: break; //NOP
+			case 0x10: opBPL();break;//BPL  
+			case 0x11: opORA(adrIndirectIndexed());break; //ORA (APZ),Y
+			case 0x12: break; //NOP
+			case 0x13: break; //NOP
+			case 0x14: break; //NOP
+			case 0x15: opORA(adrZeroPage(x_reg, VALUE)); break; //ORA APZ, X
+			case 0x16: mem_set(adrZeroPage(x_reg, ADDRESS),opASL(adrZeroPage(x_reg, VALUE)));break; //ASL APZ,X
+			case 0x17: break; //NOP
+			case 0x18: opCLC(); break; //CLC
+			case 0x19: opORA(adrAbsolute(y_reg, VALUE)); break; //ORA ADR,Y
+			case 0x1a: break; //NOP
+			case 0x1b: break; //NOP
+			case 0x1c: break; //NOP
+			case 0x1d: opORA(adrAbsolute(x_reg, VALUE)); break; //ORA ADR,X 
+			case 0x1e: mem_set(adrAbsolute(x_reg, ADDRESS), opASL(adrAbsolute(x_reg, VALUE))); break; //ASL ADR,X
+			case 0x1f: break; //NOP
 			
-            /*case 0x15://ORA APZ, X
-                // ACC <- ACC v Mem[Mem[Operand1]+X]
-                acc
-                break;*/
-			case 0x12: break;
-			case 0x13: break;
-			case 0x14: break;
-			case 0x15: break;
-			
-			// case 0x15://ORA APZ, X
-			//                // ACC <- ACC v Mem[Mem[Operand1]+X]
-			//                acc
-			case 0x16: break;
-			case 0x17: break;
-			case 0x18: break;
-			case 0x19: break;
-			case 0x1a: break;
-			case 0x1b: break;
-			case 0x1c: break;
-			case 0x1d: break;
-			case 0x1e: break;
-			case 0x1f: break;
 			case 0x20: break;
 			case 0x21: break;
 			case 0x22: break;
@@ -339,6 +311,10 @@ void launchEmulation(int Counter, int opCode, int debug) {
         if(opCode == 255 || Counter == 0) {
             break;
         }
+        if (opCode == 0x10 /*BPL*/) {
+			continue;
+		}
+		
         pc += opByteLength[opCode];
     }
     
@@ -350,7 +326,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
     }
 }
 
-/* OPERATIONS FUNCTIONS */
+/** OPERATIONS FUNCTIONS */
 void inline opBRK() {
 	state_register |= BREAK;
 	stack_push(state_register);
@@ -365,12 +341,12 @@ void inline opPHP() {
 
 //"OR" memory with accumulator
 void opORA(byte mem) {
-	printf("mem = %x\n", mem);
 	acc  |= mem;
 	stateReg_checkNZ(acc);
 }
 
 byte inline opASL(byte value) {
+	printf("value = %x\n",value);
     state_register &= ~(CARRY + NEGATIVE + ZERO);
 
     if((value & 128) > 0) {
@@ -384,29 +360,80 @@ byte inline opASL(byte value) {
     } else {
         state_register |= ZERO;
     }
+    printf("value = %x\n",value);
     return value;
 }
 void inline opBPL() {
-	
+	if((NEGATIVE & state_register) == 0){
+		opBranch();
+	}
 }
 
-/* ADDRESSING MODES */
-//
+void inline opCLC() {
+	state_register &= ~CARRY;
+}
+/**
+ * Generic Branching function
+ */
+void inline opBranch() {
+	unsigned short memAdr = pc;
+	if((Memory[pc+1] & 128) > 0)
+	{
+		//printf("Memory[pc+1] & 128) > 0\n");
+		//printf("-pc = 0x%x\n",pc);
+		//printf("-mem invert = 0x%x\n",(Memory[pc+1]^0xff));
+		//TODO Find example to test if this is the right behavior
+		pc = pc - (Memory[pc+1]^0xff) - 1;
+	} else {
+		pc = pc + Memory[pc+1];
+	}
+	//if branch changes actual page, add 2 cycle, 1 elsewere
+	ic -= 1;
+	if((memAdr & 0xff00) != (pc & 0xff00)) {
+		ic -= 1;
+		//printf("ic--2\n");
+	}
+}
+
+
+/** ADDRESSING MODES */
+
+
 unsigned short adrIndexedIndirect() {
 	byte indirect = Memory[pc+1]+x_reg;
 	return Memory[concat_operands(Memory[indirect],Memory[indirect+1])];
-}/*
-byte adrIndirectIndexed() {
-	y_reg;
-}*/
-short unsigned adrZeroPage() {
-	return Memory[Memory[pc+1]];
+}
+unsigned short adrIndirectIndexed() {
+	byte indirect = Memory[pc+1];
+	unsigned short adr = concat_operands(Memory[indirect],Memory[indirect+1]) + y_reg;
+	/*
+	 * test
+	 *printf("indirect = %x\n", indirect);
+	 *mem_get_adress_content(indirect);
+	 *mem_get_adress_content(indirect+1);
+	 *printf("concat = %x y=%x\n",concat_operands(Memory[indirect],Memory[indirect+1]),y_reg);
+	 *rintf("concat + y = %x \n", concat_operands(Memory[indirect],Memory[indirect+1]) + y_reg);
+	 *mem_get_adress_content(concat_operands(Memory[indirect],Memory[indirect+1]) + y_reg);
+	 *printf("------\n");
+	 *
+	 */
+	return Memory[adr];
+}
+short unsigned adrZeroPage(byte offset, int mode) {
+	unsigned short adr = Memory[pc + 1] + offset;
+	if(mode == ADDRESS) {
+		return adr;
+	}
+	return Memory[adr];
 }
 
 byte adrImmediate() {
 	return Memory[pc+1];
 }
 
-short unsigned adrAbsolute() {
-	return Memory[concat_next_operands()];
+short unsigned adrAbsolute(byte offset, int mode) {
+	if(mode == ADDRESS) {
+		return concat_next_operands() + offset;
+	}
+	return Memory[concat_next_operands() + offset];
 }

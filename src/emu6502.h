@@ -11,12 +11,14 @@ void opORA(byte mem);
 void inline opBRK();
 void inline opPHP();
 void inline opBPL();
-
+void inline opCLC();
+void inline opBranch();
 /* ADDRESSING MODES FUNCTIONS */
 short unsigned adrIndexedIndirect();
-short unsigned adrZeroPage();
+short unsigned adrIndirectIndexed();
+short unsigned adrZeroPage(byte offset, int mode);
 byte adrImmediate();
-short unsigned adrAbsolute();
+short unsigned adrAbsolute(byte offset, int mode);
 
 /* DEBUG / TESTING FUNCTIONS */
 void loadTestingProgram();

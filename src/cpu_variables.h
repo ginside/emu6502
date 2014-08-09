@@ -46,6 +46,7 @@ int cycles[256];
 /* Byte Length for every opCode */
 int opByteLength[256];
 
+int ADDRESS,VALUE;
 enum instruction_types;
 
 
