@@ -24,9 +24,6 @@ byte    //Memory declaration
 		//Registers declaration
 		state_register      = 32,
 		
-		// stack is into the area of memory between 0x100 and 0x1ff,
-		// starts at 1ff (going downwards)
-		stack_pointer       = 0xFF, 
 		// Index registers
 		x_reg               = 0,
 		y_reg               = 0,
@@ -36,18 +33,23 @@ unsigned short
 		// Program Counter
 		pc                  = 0,
 		// VECTORS
-		irq_vect            = 0xFFFE;
+		irq_vect            = 0xFFFE,
+		// stack is into the area of memory between 0x100 and 0x1ff,
+		// starts at 1ff (going downwards)
+		stack_pointer       = 0x1FF;
 int
 		// Cycle counting, for interruptions
 		ic                  = 0,
 		interrupt_period    = 0;
 
-/* Cpu cycles required per opcode, Y axis is strong weight bit */
-int cycles[256] = {
+
+/* Byte Length for every opCode */
+int opByteLength[256] = {
                 //  0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f
-           /* 0 */  7 , 6 , 0 , 0 , 0 , 3 , 5 , 0 , 3 , 2 , 2 , 0 , 0 , 4 , 6 , 0 ,
-           /* 1 */  2 , 5 , 0 , 0 , 0 , 4 , 6 , 0 , 0 , 4 , 0 , 0 , 0 , 4 , 7 , 0 ,
-           /* 2 */  0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
+           /* 0 */  1 , 2 , 0 , 0 , 0 , 2 , 2 , 0 , 1 , 2 , 1 , 0 , 0 , 3 , 3 , 0 ,
+           /* 1 */  2 , 2 , 0 , 0 , 0 , 2 , 2 , 0 , 0 , 3 , 0 , 0 , 0 , 3 , 3 , 0 ,
+           /* 2 */  3 , 2 , 0 , 0 , 2 , 2 , 2 , 0 , 1 , 2 , 1 , 0 , 3 , 3 , 3 , 0 ,
+           
            /* 3 */  0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
            /* 4 */  0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
            /* 5 */  0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
@@ -63,12 +65,14 @@ int cycles[256] = {
            /* f */  0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0
                     };
 
-/* Byte Length for every opCode */
-int opByteLength[256] = {
+/* Cpu cycles required per opcode, Y axis is strong weight bit */
+int cycles[256] = {
                 //  0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f
-           /* 0 */  1 , 2 , 0 , 0 , 0 , 2 , 2 , 0 , 1 , 2 , 1 , 0 , 0 , 3 , 3 , 0 ,
-           /* 1 */  2 , 2 , 0 , 0 , 0 , 2 , 2 , 0 , 0 , 3 , 0 , 0 , 0 , 3 , 3 , 0 ,
-           /* 2 */  0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
+           /* 0 */  7 , 6 , 0 , 0 , 0 , 3 , 5 , 0 , 3 , 2 , 2 , 0 , 0 , 4 , 6 , 0 ,
+           /* 1 */  2 , 5 , 0 , 0 , 0 , 4 , 6 , 0 , 0 , 4 , 0 , 0 , 0 , 4 , 7 , 0 ,
+           
+           /* 2 */  6 , 6 , 0 , 0 , 3 , 3 , 5 , 0 , 4 , 2 , 2 , 0 , 4 , 4 , 6 , 0 ,
+           
            /* 3 */  0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
            /* 4 */  0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
            /* 5 */  0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
@@ -86,7 +90,9 @@ int opByteLength[256] = {
 
 //
 int VALUE = 0,
-	ADDRESS = 1;
+	ADDRESS = 1,
+	LEFT = 0,
+	RIGHT = 1;
 
 enum instruction_types {
     NOP, //	Pas d'opération

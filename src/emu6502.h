@@ -6,12 +6,18 @@ typedef unsigned char byte;
 #include "tools.h"
 
 /* OPERATIONS FUNCTIONS */
-byte inline opASL(byte value);
-void opORA(byte mem);
+byte inline opASL(byte mem);
+void inline opORA(byte mem);
 void inline opBRK();
 void inline opPHP();
 void inline opBPL();
 void inline opCLC();
+void inline opJSR();
+void inline opAND(byte mem);
+void inline opBIT(byte mem);
+byte inline opROL(byte mem);
+byte inline opROR(byte mem);
+void inline opPLP();
 void inline opBranch();
 /* ADDRESSING MODES FUNCTIONS */
 short unsigned adrIndexedIndirect();

@@ -24,8 +24,7 @@ int instruct_00(){
 void loadTestingProgram(int program_id){
     reinit_emulation();
     switch(program_id){
-        case 1:
-            //testing instructions from 0x0 to 0x9
+        case 0://0x0 to 0x10
             Memory[0] = 0x6;//ASL APZ
             Memory[1] = 0xfa;//OPERAND 1      assert $FA = E2
             Memory[2] = 0x8;//PHP
@@ -43,7 +42,7 @@ void loadTestingProgram(int program_id){
             launchEmulation(20,1,1);
             
             assert(Memory[0xfa] == 0xe2); // TEST ASL - Page Zero (0x6)
-            assert(Memory[0xFF+0xFF] == 0xa0); // TEST PHP (0x8)
+            assert(Memory[0x1FF] == 0xa0); // TEST PHP (0x8)
             assert(acc == 0x13); // TEST ORA - Page Zero (0x5)
             
             reinit_emulation();
@@ -77,12 +76,8 @@ void loadTestingProgram(int program_id){
             assert((state_register & BREAK) == BREAK);
             //assert(pc == irq_vect);//TEST BRK (0x00)...
             
-            break;
+            reinit_emulation();
             
-            
-            
-        case 2:
-            //Testing instructions from 0xa to 0x10
             Memory[0] = 0x0d;// ORA ABS
             Memory[1] = 0x1d;
             Memory[2] = 0xff;
@@ -105,8 +100,8 @@ void loadTestingProgram(int program_id){
             assert( pc == 0x8); //TEST DOUBLE BPL
             assert( ic == 0xfffffff0); //TEST DOUBLE BPL
             break;
-        case 3:
-            //Testing instructions from 0x11 to 0x1f
+            
+        case 1://0x11 to 0x1f
             Memory[0] = 0x11; // ORA (IND),Y
             Memory[1] = 0xa5;
             Memory[2] = 0xff;
@@ -171,7 +166,226 @@ void loadTestingProgram(int program_id){
             assert(acc == 0xa3); // TEST ORA ADR,X
             assert(Memory[0xb124] == 0x02); // TEST ASL ADR,X
             assert((state_register & CARRY) == 0); // TEST CLC
+            
             break;
+            
+        case 2://0x20 to 0x2f
+			
+			Memory[0x0000] 	= 0x20; // JSR ABS
+			Memory[0x0001] 	= 0x05;
+			Memory[0x0002] 	= 0x01; 
+			Memory[0x0105] 	= 0x20; // JSR ABS
+			Memory[0x0106]  = 0x03;
+			Memory[0x0107]  = 0x00;
+			Memory[0x0003]	= 0x21; // AND (APZ,X)
+			Memory[0x0004]  = 0xEF;
+			Memory[0x0005]  = 0xFF; // END --- 
+			
+			Memory[0x0093]  = 0xAA;
+			Memory[0x00AA]  = 0x17;
+			x_reg = 0xA4;
+			acc = 0xCB;
+			
+			printLoadedProgram();
+			launchEmulation(50,1,1);
+			
+			assert(Memory[0x01FF] == 0); // TEST JSR
+			assert(Memory[0x01FE] == 2); // TEST JSR
+			assert(Memory[0x01FD] == 1); // TEST JSR
+			assert(Memory[0x01FC] == 7); // TEST JSR
+			assert(acc == 0x03); // TEST AND (APZ,X)
+			
+			
+            reinit_emulation();
+            
+            Memory[0x0000] = 0x24; // BIT APZ
+            Memory[0x0001] = 0x56;
+            Memory[0x0002] = 0xff;
+            Memory[0x0056] = 0xf5;
+            acc = 0xa4;
+            
+			printLoadedProgram();
+			launchEmulation(50,1,1);
+			
+            assert((state_register & NEGATIVE) != 0); // TEST BIT APZ
+            assert((state_register & OVERFLOW) != 0); // TEST BIT APZ
+            assert((state_register & ZERO) == 0); // TEST BIT APZ
+            
+            reinit_emulation();
+            
+            Memory[0x0000] = 0x24; // BIT APZ
+            Memory[0x0001] = 0x56;
+            Memory[0x0002] = 0xff;
+            Memory[0x0056] = 0x00;
+            acc = 0xa4;
+            
+			printLoadedProgram();
+			launchEmulation(4,1,1);
+			
+            assert((state_register & NEGATIVE) == 0); // TEST BIT APZ
+            assert((state_register & OVERFLOW) == 0); // TEST BIT APZ
+            assert((state_register & ZERO) != 0); // TEST BIT APZ
+            
+            reinit_emulation();
+            
+            Memory[0x0000] = 0x25; // AND APZ
+            Memory[0x0001] = 0x56;
+            Memory[0x0002] = 0xff;
+            Memory[0x0056] = 0x00;
+            acc = 0xa4;
+            
+			printLoadedProgram();
+			launchEmulation(4,1,1);
+			
+            assert((state_register & ZERO) != 0); // TEST AND APZ
+            assert(acc == 0); // TEST AND APZ
+            
+            
+            reinit_emulation();
+            
+            Memory[0x0000] = 0x26; // ROL APZ
+            Memory[0x0001] = 0x56; // ROL ADDRESS 0x0056
+            Memory[0x0002] = 0x26; // ROL APZ
+            Memory[0x0003] = 0x57; // ROL ADDRESS 0x0057
+            Memory[0x0004] = 0xff;
+            Memory[0x0056] = 0x47;
+            Memory[0x0057] = 0x82;
+            state_register |= CARRY;
+            
+			printLoadedProgram();
+			launchEmulation(4,1,1);
+			
+            assert((state_register & CARRY) != 0);
+            assert(Memory[0x0056] == 0x008F); // TEST ROL APZ
+            assert(Memory[0x0057] == 0x0004); // TEST ROL APZ
+            
+            reinit_emulation();
+            
+            Memory[0x0000] = 0x28; // PLP
+            Memory[0x0001] = 0xFF; // END
+            Memory[0x01FF] = 0xE2; // SET SR as 0xE2
+            
+            
+			printLoadedProgram();
+			launchEmulation(2,1,1);
+			
+            assert(state_register == 0x00E2); // TEST PLP
+            assert(stack_pointer == 0x0200); // TEST PLP 
+            
+            reinit_emulation();
+            
+            Memory[0x0000] = 0x29; // AND #DON
+            Memory[0x0001] = 0xC2; // SET ACC TO 0x40
+            Memory[0x0002] = 0xFF; // END
+            Memory[0x01FF] = 0xE2;
+            acc = 0x44;
+            
+			printLoadedProgram();
+			launchEmulation(5,1,1);
+			
+            assert(acc == 0x40); // TEST AND #DON
+            
+            reinit_emulation();
+            
+            Memory[0x0000] = 0x2a; // ROL ACC SET ACC TO 0x89
+            Memory[0x0001] = 0xFF; // END
+            acc = 0x44;
+            state_register |= CARRY;
+            
+			printLoadedProgram();
+			launchEmulation(5,1,1);
+			
+            assert((state_register & CARRY) == 0);
+            assert(acc == 0x89); // TEST ROL ACC
+            
+            reinit_emulation();
+            
+            Memory[0x0000] = 0x2c; // BIT ABS
+            Memory[0x0001] = 0x02; 
+            Memory[0x0002] = 0x03; 
+            Memory[0x0003] = 0xFF; 
+            
+            Memory[0x0302] = 0xFF;
+            acc = 0x89;
+            state_register |= CARRY;
+            
+			printLoadedProgram();
+			launchEmulation(5,1,1);
+			
+            assert((state_register & NEGATIVE) != 0); // TEST BIT ABS
+            assert((state_register & OVERFLOW) != 0); // TEST BIT ABS
+            assert((state_register & ZERO) == 0); // TEST BIT ABS
+            
+            
+            reinit_emulation();
+            
+            Memory[0x0000] = 0x2d; // AND ABS
+            Memory[0x0001] = 0x90; 
+            Memory[0x0002] = 0x00; 
+            Memory[0x0003] = 0xFF; 
+            Memory[0x0090] = 0x7d; 
+            acc = 0x89;
+            
+			printLoadedProgram();
+			launchEmulation(5,1,1);
+			
+            assert(acc == 0x09); // TEST AND ABS
+            
+            reinit_emulation();
+            
+            Memory[0x0000] = 0x2E; // ROL ABS
+            Memory[0x0001] = 0x90; 
+            Memory[0x0002] = 0x00; 
+            Memory[0x0003] = 0xFF; 
+            Memory[0x0090] = 0x7d; 
+            state_register |= CARRY;
+            
+			printLoadedProgram();
+			launchEmulation(5,1,1);
+			
+            assert(Memory[0x0090] == 0xfb); // TEST AND ABS
+            assert((state_register & CARRY) == 0); // TEST AND ABS
+			break;
+			
+        case 3://0x30 to 0x3f
+			break;
+			
+        case 4://0x40 to 0x4f
+			break;
+			
+        case 5://0x50 to 0x5f
+			break;
+			
+        case 6://0x60 to 0x6f
+			break;
+			
+        case 7://0x70 to 0x7f
+			break;
+			
+			
+        case 8://0x80 to 0x8f
+			break;
+			
+        case 9://0x90 to 0x9f
+			break;
+			
+        case 0xa://0xa0 to 0xaf
+			break;
+			
+        case 11://0xb0 to 0xbf
+			break;
+			
+        case 12://0xc0 to 0xcf
+			break;
+			
+        case 0xd://0xd0 to 0xdf
+			break;
+			
+        case 0xe://0xe0 to 0xef
+			break;
+			
+        case 0xf://0xf0 to 0xff
+			break;
     }
 }
 

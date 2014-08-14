@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "emu6502.h"
 #include "cpu_variables.h"
+#include "assert.h"
 
 void cpu_showState(byte opCode){
     printf("+-- CPU STATE --+\nRegister X : 0x%x\nRegister Y : 0x%x\n", x_reg,y_reg);
@@ -30,7 +31,7 @@ void cpu_showState(byte opCode){
  */
 void mem_reset() {
     int i =0;
-    for (i = 0;i< 0xFF;i++)
+    for (i = 0;i< 0xFFFF;i++)
         Memory[i] = 0;
 }
 
@@ -59,30 +60,29 @@ unsigned short concat_next_operands() {
 /**
  * Push a memory address content in the stack
  */
-void inline stack_push(byte b){
-    Memory[0xFF+stack_pointer] = b;
+void inline stack_push(byte b) {
+	//printf("push %x at 0x%x\n",b,stack_pointer);
+    Memory[stack_pointer] = b;
     stack_pointer -= 1;
+    assert(stack_pointer > 0x100);
 }
 
 /**
  * Pops the top stack element
  */
-byte inline stack_pop(){
+byte inline stack_pop() {
     stack_pointer += 1;
-    return Memory[0xFF+stack_pointer-1];
+    return Memory[stack_pointer-1];
 }
 
 /**
  * Prints the stack contents
  */
-void stack_showState(){
+void stack_showState() {
     printf("-- STACK STATE -- \n");
     int i;
-    for(i=0xFF;i >= stack_pointer ; i--)
-        printf("$%x  %x\n",i,Memory[0xFF+i]);
-    for(i=0x9;i >= stack_pointer ; i--)
-        printf("$0%x  %x\n",i,Memory[0xFF+i]);
-
+    for(i=0x1FF;i >= stack_pointer ; i--)
+        printf("$%x  %x \n",i,Memory[i]);
     printf("-- STACK END --\n\n\n");
 }
 /* STATE REGISTER FUNCTIONS */
@@ -103,7 +103,12 @@ void inline stateReg_checkNZ(byte op_result){
 
 	state_register |= op_result & NEGATIVE;
 }
-
+void inline stateReg_checkZ(byte op_result) {
+	state_register &= ~ZERO;
+	if(op_result == 0) {
+		state_register |= ZERO;
+	}
+}
 
 void reinit_emulation() {
 	printf("\n\n -- REINITIALISATION --\n\n\n");
@@ -115,7 +120,7 @@ void reinit_emulation() {
 		
 	// stack is into the area of memory between 0x100 and 0x1ff,
 	// starts at 1ff (going downwards)
-	stack_pointer       = 0xFF, 
+	stack_pointer       = 0x1FF, 
 	// Index registers
 	x_reg               = 0,
 	y_reg               = 0;

@@ -15,6 +15,6 @@ byte inline stack_pop();
 
 /* STATE REGISTER FUNCTIONS */
 void inline stateReg_checkNZ(byte op_result);
-
+void inline stateReg_checkZ(byte op_result);
 void reinit_emulation();
 #endif /* TOOLS_H */

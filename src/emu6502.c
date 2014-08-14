@@ -10,8 +10,8 @@
 
 int main(){
     mem_reset();
-    int i = 1;
-    for(i; i<=3 ; i++) {
+    int i = 0x0;
+    for(i; i<=0x2 ; i++) {
 		loadTestingProgram(i);
 	}
 
@@ -42,7 +42,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
         ic      -=  cycles[opCode];
         
 
-        printf("PC=%x | OPCODE=%x | IC=%x \n",pc,opCode,ic);
+        printf("PC=0x%x | OPCODE=0x%x | IC=0x%x \n",pc,opCode,ic);
 		
 
         switch(opCode)
@@ -63,6 +63,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x0d: opORA(adrAbsolute(0, VALUE)); break; //ORA ADR
 			case 0x0e: mem_set(adrAbsolute(0, ADDRESS), opASL(adrAbsolute(0, VALUE))); break; //ASL ADR 
 			case 0x0f: break; //NOP
+			
 			case 0x10: opBPL();break;//BPL  
 			case 0x11: opORA(adrIndirectIndexed());break; //ORA (APZ),Y
 			case 0x12: break; //NOP
@@ -80,238 +81,250 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x1e: mem_set(adrAbsolute(x_reg, ADDRESS), opASL(adrAbsolute(x_reg, VALUE))); break; //ASL ADR,X
 			case 0x1f: break; //NOP
 			
-			case 0x20: break;
-			case 0x21: break;
-			case 0x22: break;
-			case 0x23: break;
-			case 0x24: break;
-			case 0x25: break;
-			case 0x26: break;
-			case 0x27: break;
-			case 0x28: break;
-			case 0x29: break;
-			case 0x2a: break;
-			case 0x2b: break;
-			case 0x2c: break;
-			case 0x2d: break;
-			case 0x2e: break;
-			case 0x2f: break;
-			case 0x30: break;
-			case 0x31: break;
-			case 0x32: break;
-			case 0x33: break;
-			case 0x34: break;
-			case 0x35: break;
-			case 0x36: break;
-			case 0x37: break;
-			case 0x38: break;
-			case 0x39: break;
-			case 0x3a: break;
-			case 0x3b: break;
-			case 0x3c: break;
-			case 0x3d: break;
-			case 0x3e: break;
-			case 0x3f: break;
-			case 0x40: break;
-			case 0x41: break;
-			case 0x42: break;
-			case 0x43: break;
-			case 0x44: break;
-			case 0x45: break;
-			case 0x46: break;
-			case 0x47: break;
-			case 0x48: break;
-			case 0x49: break;
-			case 0x4a: break;
-			case 0x4b: break;
-			case 0x4c: break;
-			case 0x4d: break;
-			case 0x4e: break;
-			case 0x4f: break;
-			case 0x50: break;
-			case 0x51: break;
-			case 0x52: break;
-			case 0x53: break;
-			case 0x54: break;
-			case 0x55: break;
-			case 0x56: break;
-			case 0x57: break;
-			case 0x58: break;
-			case 0x59: break;
-			case 0x5a: break;
-			case 0x5b: break;
-			case 0x5c: break;
-			case 0x5d: break;
-			case 0x5e: break;
-			case 0x5f: break;
-			case 0x60: break;
-			case 0x61: break;
-			case 0x62: break;
-			case 0x63: break;
-			case 0x64: break;
-			case 0x65: break;
-			case 0x66: break;
-			case 0x67: break;
-			case 0x68: break;
-			case 0x69: break;
-			case 0x6a: break;
-			case 0x6b: break;
-			case 0x6c: break;
-			case 0x6d: break;
-			case 0x6e: break;
-			case 0x6f: break;
-			case 0x70: break;
-			case 0x71: break;
-			case 0x72: break;
-			case 0x73: break;
-			case 0x74: break;
-			case 0x75: break;
-			case 0x76: break;
-			case 0x77: break;
-			case 0x78: break;
-			case 0x79: break;
-			case 0x7a: break;
-			case 0x7b: break;
-			case 0x7c: break;
-			case 0x7d: break;
-			case 0x7e: break;
-			case 0x7f: break;
-			case 0x80: break;
-			case 0x81: break;
-			case 0x82: break;
-			case 0x83: break;
-			case 0x84: break;
-			case 0x85: break;
-			case 0x86: break;
-			case 0x87: break;
-			case 0x88: break;
-			case 0x89: break;
-			case 0x8a: break;
-			case 0x8b: break;
-			case 0x8c: break;
-			case 0x8d: break;
-			case 0x8e: break;
-			case 0x8f: break;
-			case 0x90: break;
-			case 0x91: break;
-			case 0x92: break;
-			case 0x93: break;
-			case 0x94: break;
-			case 0x95: break;
-			case 0x96: break;
-			case 0x97: break;
-			case 0x98: break;
-			case 0x99: break;
-			case 0x9a: break;
-			case 0x9b: break;
-			case 0x9c: break;
-			case 0x9d: break;
-			case 0x9e: break;
-			case 0x9f: break;
-			case 0xa0: break;
-			case 0xa1: break;
-			case 0xa2: break;
-			case 0xa3: break;
-			case 0xa4: break;
-			case 0xa5: break;
-			case 0xa6: break;
-			case 0xa7: break;
-			case 0xa8: break;
-			case 0xa9: break;
-			case 0xaa: break;
-			case 0xab: break;
-			case 0xac: break;
-			case 0xad: break;
-			case 0xae: break;
-			case 0xaf: break;
-			case 0xb0: break;
-			case 0xb1: break;
-			case 0xb2: break;
-			case 0xb3: break;
-			case 0xb4: break;
-			case 0xb5: break;
-			case 0xb6: break;
-			case 0xb7: break;
-			case 0xb8: break;
-			case 0xb9: break;
-			case 0xba: break;
-			case 0xbb: break;
-			case 0xbc: break;
-			case 0xbd: break;
-			case 0xbe: break;
-			case 0xbf: break;
-			case 0xc0: break;
-			case 0xc1: break;
-			case 0xc2: break;
-			case 0xc3: break;
-			case 0xc4: break;
-			case 0xc5: break;
-			case 0xc6: break;
-			case 0xc7: break;
-			case 0xc8: break;
-			case 0xc9: break;
-			case 0xca: break;
-			case 0xcb: break;
-			case 0xcc: break;
-			case 0xcd: break;
-			case 0xce: break;
-			case 0xcf: break;
-			case 0xd0: break;
-			case 0xd1: break;
-			case 0xd2: break;
-			case 0xd3: break;
-			case 0xd4: break;
-			case 0xd5: break;
-			case 0xd6: break;
-			case 0xd7: break;
-			case 0xd8: break;
-			case 0xd9: break;
-			case 0xda: break;
-			case 0xdb: break;
-			case 0xdc: break;
-			case 0xdd: break;
-			case 0xde: break;
-			case 0xdf: break;
-			case 0xe0: break;
-			case 0xe1: break;
-			case 0xe2: break;
-			case 0xe3: break;
-			case 0xe4: break;
-			case 0xe5: break;
-			case 0xe6: break;
-			case 0xe7: break;
-			case 0xe8: break;
-			case 0xe9: break;
-			case 0xea: break;
-			case 0xeb: break;
-			case 0xec: break;
-			case 0xed: break;
-			case 0xee: break;
-			case 0xef: break;
-			case 0xf0: break;
-			case 0xf1: break;
-			case 0xf2: break;
-			case 0xf3: break;
-			case 0xf4: break;
-			case 0xf5: break;
-			case 0xf6: break;
-			case 0xf7: break;
-			case 0xf8: break;
-			case 0xf9: break;
-			case 0xfa: break;
-			case 0xfb: break;
-			case 0xfc: break;
-			case 0xfd: break;
-			case 0xfe: break;
-			case 0xff: break;
-
+			case 0x20: opJSR(); break; //JSR ADR
+			case 0x21: opAND(adrIndexedIndirect()); break; //AND (APZ,X)
+			case 0x22: break; //NOP
+			case 0x23: break; //NOP
+			case 0x24: opBIT(adrZeroPage(0, VALUE)); break; //BIT APZ
+			case 0x25: opAND(adrZeroPage(0, VALUE)); break; //AND APZ
+			case 0x26: mem_set(adrZeroPage(0, ADDRESS), opROL(adrZeroPage(0, VALUE))); break; //ROL APZ
+			case 0x27: break; //NOP
+			case 0x28: opPLP(); break; //PLP
+			case 0x29: opAND(adrImmediate()); break; //AND #DON
+			case 0x2a: acc = opROL(acc); break; //ROL ACC
+			case 0x2b: break; //NOP
+			case 0x2c: opBIT(adrAbsolute(0, VALUE)); break; //BIT ADR
+			case 0x2d: opAND(adrAbsolute(0, VALUE)); break; //AND ADR
+			case 0x2e: mem_set(adrAbsolute(0, ADDRESS), opROL(adrAbsolute(0, VALUE))); break; //ROL ADR
+			case 0x2f: break; //NOP
+			
+			case 0x30: break; //BMI rel
+			case 0x31: break; //AND (APZ),Y
+			case 0x32: break; //NOP
+			case 0x33: break; //NOP
+			case 0x34: break; //NOP
+			case 0x35: break; //AND APZ,X
+			case 0x36: break; //ROL APZ,X
+			case 0x37: break; //NOP
+			case 0x38: break; //SEC 
+			case 0x39: break; //AND ADR,Y
+			case 0x3a: break; //NOP
+			case 0x3b: break; //NOP
+			case 0x3c: break; //NOP
+			case 0x3d: break; //AND ADR,X
+			case 0x3e: break; //ROL ADR,X
+			case 0x3f: break; //NOP
+			
+			case 0x40: break; //RTI 
+			case 0x41: break; //EOR (APZ,X)
+			case 0x42: break; //NOP
+			case 0x43: break; //NOP
+			case 0x44: break; //NOP
+			case 0x45: break; //EOR APZ
+			case 0x46: break; //LSR APZ
+			case 0x47: break; //NOP
+			case 0x48: break; //PHA 
+			case 0x49: break; //EOR #DON
+			case 0x4a: break; //LSR ACC
+			case 0x4b: break; //NOP
+			case 0x4c: break; //JMP ADR
+			case 0x4d: break; //EOR ADR
+			case 0x4e: break; //LSR ADR
+			case 0x4f: break; //NOP
+			
+			case 0x50: break; //BVC rel
+			case 0x51: break; //EOR (APZ),Y
+			case 0x52: break; //NOP
+			case 0x53: break; //NOP
+			case 0x54: break; //NOP
+			case 0x55: break; //EOR APZ,X
+			case 0x56: break; //LSR APZ,X
+			case 0x57: break; //NOP
+			case 0x58: break; //CLI 
+			case 0x59: break; //EOR ADR,Y
+			case 0x5a: break; //NOP
+			case 0x5b: break; //NOP
+			case 0x5c: break; //NOP
+			case 0x5d: break; //EOR ADR,X
+			case 0x5e: break; //LSR ADR,X
+			case 0x5f: break; //NOP
+			
+			case 0x60: break; //RTS 
+			case 0x61: break; //ADC (APZ,X)
+			case 0x62: break; //NOP
+			case 0x63: break; //NOP
+			case 0x64: break; //NOP
+			case 0x65: break; //ADC APZ
+			case 0x66: break; //ROR APZ
+			case 0x67: break; //NOP
+			case 0x68: break; //PLA 
+			case 0x69: break; //ADC #DON
+			case 0x6a: break; //ROR ACC
+			case 0x6b: break; //NOP
+			case 0x6c: break; //JMP ind
+			case 0x6d: break; //ADC ADR
+			case 0x6e: break; //ROR ADR
+			case 0x6f: break; //NOP
+			
+			case 0x70: break; //BVS rel
+			case 0x71: break; //ADC (APZ),Y
+			case 0x72: break; //NOP
+			case 0x73: break; //NOP
+			case 0x74: break; //NOP
+			case 0x75: break; //ADC APZ,X
+			case 0x76: break; //ROR APZ,X
+			case 0x77: break; //NOP
+			case 0x78: break; //SEI 
+			case 0x79: break; //ADC ADR,Y
+			case 0x7a: break; //NOP
+			case 0x7b: break; //NOP
+			case 0x7c: break; //NOP
+			case 0x7d: break; //ADC ADR,X
+			case 0x7e: break; //ROR ADR,X
+			case 0x7f: break; //NOP
+			
+			case 0x80: break; //NOP
+			case 0x81: break; //STA (APZ,X)
+			case 0x82: break; //NOP
+			case 0x83: break; //NOP
+			case 0x84: break; //STY APZ
+			case 0x85: break; //STA APZ
+			case 0x86: break; //STX APZ
+			case 0x87: break; //NOP
+			case 0x88: break; //DEY 
+			case 0x89: break; //NOP
+			case 0x8a: break; //TXA 
+			case 0x8b: break; //NOP
+			case 0x8c: break; //STY ADR
+			case 0x8d: break; //STA ADR
+			case 0x8e: break; //STX ADR
+			case 0x8f: break; //NOP
+			
+			case 0x90: break; //BCC rel
+			case 0x91: break; //STA (APZ),Y
+			case 0x92: break; //NOP
+			case 0x93: break; //NOP
+			case 0x94: break; //STY APZ,X
+			case 0x95: break; //STA APZ,X
+			case 0x96: break; //STX APZ,Y
+			case 0x97: break; //NOP
+			case 0x98: break; //TYA 
+			case 0x99: break; //STA ADR,Y
+			case 0x9a: break; //TXS 
+			case 0x9b: break; //NOP
+			case 0x9c: break; //NOP
+			case 0x9d: break; //STA ADR,X
+			case 0x9e: break; //NOP
+			case 0x9f: break; //NOP
+			
+			case 0xa0: break; //LDY #DON
+			case 0xa1: break; //LDA (APZ,X)
+			case 0xa2: break; //LDX #DON
+			case 0xa3: break; //NOP
+			case 0xa4: break; //LDY APZ
+			case 0xa5: break; //LDA APZ
+			case 0xa6: break; //LDX APZ
+			case 0xa7: break; //NOP
+			case 0xa8: break; //TAY 
+			case 0xa9: break; //LDA #DON
+			case 0xaa: break; //TAX 
+			case 0xab: break; //NOP
+			case 0xac: break; //LDY ADR
+			case 0xad: break; //LDA ADR
+			case 0xae: break; //LDX ADR
+			case 0xaf: break; //NOP
+			
+			case 0xb0: break; //BCS rel
+			case 0xb1: break; //LDA (APZ),Y
+			case 0xb2: break; //NOP
+			case 0xb3: break; //NOP
+			case 0xb4: break; //LDY APZ,X
+			case 0xb5: break; //LDA APZ,X
+			case 0xb6: break; //LDX APZ,Y
+			case 0xb7: break; //NOP
+			case 0xb8: break; //CLV 
+			case 0xb9: break; //LDA ADR,Y
+			case 0xba: break; //TSX 
+			case 0xbb: break; //NOP
+			case 0xbc: break; //LDY ADR,X
+			case 0xbd: break; //LDA ADR,X
+			case 0xbe: break; //LDX ADR,Y
+			case 0xbf: break; //NOP
+			
+			case 0xc0: break; //CPY #DON
+			case 0xc1: break; //CMP (APZ,X)
+			case 0xc2: break; //NOP
+			case 0xc3: break; //NOP
+			case 0xc4: break; //CPY APZ
+			case 0xc5: break; //CMP APZ
+			case 0xc6: break; //DEC APZ
+			case 0xc7: break; //NOP
+			case 0xc8: break; //INY 
+			case 0xc9: break; //CMP #DON
+			case 0xca: break; //DEX 
+			case 0xcb: break; //NOP
+			case 0xcc: break; //CPY ADR
+			case 0xcd: break; //CMP ADR
+			case 0xce: break; //DEC ADR
+			case 0xcf: break; //NOP
+			
+			case 0xd0: break; //BNE rel
+			case 0xd1: break; //CMP (APZ),Y
+			case 0xd2: break; //NOP
+			case 0xd3: break; //NOP
+			case 0xd4: break; //NOP
+			case 0xd5: break; //CMP APZ,X
+			case 0xd6: break; //DEC APZ,X
+			case 0xd7: break; //NOP
+			case 0xd8: break; //CLD 
+			case 0xd9: break; //CMP ADR,Y
+			case 0xda: break; //NOP
+			case 0xdb: break; //NOP
+			case 0xdc: break; //NOP
+			case 0xdd: break; //CMP ADR,X
+			case 0xde: break; //DEC ADR,X
+			case 0xdf: break; //NOP
+			
+			case 0xe0: break; //CPX #DON
+			case 0xe1: break; //SBC (APZ,X)
+			case 0xe2: break; //NOP
+			case 0xe3: break; //NOP
+			case 0xe4: break; //CPX APZ
+			case 0xe5: break; //SBC APZ
+			case 0xe6: break; //INC APZ
+			case 0xe7: break; //NOP
+			case 0xe8: break; //INX 
+			case 0xe9: break; //SBC #DON
+			case 0xea: break; //NOP 
+			case 0xeb: break; //NOP
+			case 0xec: break; //CPX ADR
+			case 0xed: break; //SBC ADR
+			case 0xee: break; //INC ADR
+			case 0xef: break; //NOP
+			
+			case 0xf0: break; //BEQ rel
+			case 0xf1: break; //SBC (APZ),Y
+			case 0xf2: break; //NOP
+			case 0xf3: break; //NOP
+			case 0xf4: break; //NOP
+			case 0xf5: break; //SBC APZ,X
+			case 0xf6: break; //INC APZ,X
+			case 0xf7: break; //NOP
+			case 0xf8: break; //SED 
+			case 0xf9: break; //SBC ADR,Y
+			case 0xfa: break; //NOP
+			case 0xfb: break; //NOP
+			case 0xfc: break; //NOP
+			case 0xfd: break; //SBC ADR,X
+			case 0xfe: break; //INC ADR,X
+			case 0xff: break; //NOP
         }
 
         Counter--;
         if(opCode == 255 || Counter == 0) {
             break;
         }
-        if (opCode == 0x10 /*BPL*/) {
+        if (opCode == 0x10 /*BPL*/ || opCode == 0x20 /*JSR*/) {
 			continue;
 		}
 		
@@ -326,43 +339,82 @@ void launchEmulation(int Counter, int opCode, int debug) {
     }
 }
 
-/** OPERATIONS FUNCTIONS */
-void inline opBRK() {
-	state_register |= BREAK;
-	stack_push(state_register);
-	stack_push((pc<<8)>>8);
-	stack_push(pc>>8);
-	pc = irq_vect;
-}
 
-void inline opPHP() {
-	stack_push(state_register); 
-}
+/** 
+ * OPERATIONS FUNCTIONS 
+ */
+
 
 //"OR" memory with accumulator
 void opORA(byte mem) {
 	acc  |= mem;
 	stateReg_checkNZ(acc);
 }
+void inline opAND(byte mem) {
+	//printf("value AND = 0x%x acc= 0x%x ",value,acc);
+	acc &= mem;
+	//printf(" >>> acc = 0x%x",acc);
+	//printf("\n");
+	stateReg_checkNZ(acc);
+};
 
-byte inline opASL(byte value) {
-	printf("value = %x\n",value);
+byte inline opASL(byte mem) {
+	//printf("value = %x\n",value);
     state_register &= ~(CARRY + NEGATIVE + ZERO);
 
-    if((value & 128) > 0) {
+    if((mem & 128) > 0) {
         state_register |= CARRY;
     }
     
-    value = value << 1;
+    mem = mem << 1;
 
-    if (value != 0) {
-        state_register |= (value & 128);
+    if (mem != 0) {
+        state_register |= (mem & 128);
     } else {
         state_register |= ZERO;
     }
-    printf("value = %x\n",value);
-    return value;
+    //printf("value = %x\n",value);
+    return mem;
 }
+
+byte inline opROL(byte mem) {
+	//printf("old_mem_value = 0x%x\n", mem);
+	byte old_carry = (state_register & CARRY),
+		 new_carry = 0;
+	//printf("old_carry = 0x%x\n", old_carry);
+	if (mem & NEGATIVE) {
+		new_carry = CARRY;
+	}
+	//printf("new_carry = 0x%x\n", new_carry);
+	mem <<= 1;
+	
+	if (old_carry) {
+		mem |= CARRY;
+	}
+	state_register &= ~(CARRY);
+	state_register |= new_carry;
+	
+	//printf("new_mem_value = 0x%x\n", mem);
+	return mem;
+}
+
+byte inline opROR(byte mem) {
+	byte old_carry = (state_register & CARRY),
+		 new_carry = 0;
+	if (mem & CARRY) {
+		new_carry = CARRY;
+	}
+	
+	mem >>= 1;
+	
+	if (old_carry) {
+		mem |= NEGATIVE;
+	}
+	state_register |= new_carry;
+	
+	return mem;
+}
+
 void inline opBPL() {
 	if((NEGATIVE & state_register) == 0){
 		opBranch();
@@ -372,6 +424,34 @@ void inline opBPL() {
 void inline opCLC() {
 	state_register &= ~CARRY;
 }
+void inline opBRK() {
+	state_register |= BREAK;
+	stack_push(state_register);
+	stack_push(pc>>8);
+	stack_push((pc << 8) >> 8);
+	pc = irq_vect;
+}
+
+void inline opPHP() {
+	stack_push(state_register); 
+}
+void inline opPLP() {
+	state_register = stack_pop();
+}
+void inline opJSR() {
+	stack_push(((pc + 2) >> 8));
+	stack_push(((pc + 2) << 8) >> 8);
+	pc = concat_next_operands();
+}
+
+void inline opBIT(byte mem) {
+	//printf("mem = 0x%x\n", mem);
+	state_register &= ~(NEGATIVE + OVERFLOW);
+	stateReg_checkZ(acc & mem);
+	state_register |= mem & NEGATIVE;
+	state_register |= mem & OVERFLOW;
+}
+
 /**
  * Generic Branching function
  */
@@ -396,11 +476,18 @@ void inline opBranch() {
 }
 
 
+
 /** ADDRESSING MODES */
 
 
 unsigned short adrIndexedIndirect() {
 	byte indirect = Memory[pc+1]+x_reg;
+	
+	
+	/*printf("Memory[pc+1] = 0x%x x_reg = 0x%x\n",Memory[pc+1], x_reg);
+	printf("Indirect = 0x%x\n",indirect);
+	printf("value = 0x%x\n", concat_operands(Memory[indirect],Memory[indirect+1]));*/
+	
 	return Memory[concat_operands(Memory[indirect],Memory[indirect+1])];
 }
 unsigned short adrIndirectIndexed() {

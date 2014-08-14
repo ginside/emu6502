@@ -24,7 +24,6 @@ byte    //Memory declaration
 		Memory[0xFFFF],
 		//Registers declaration
 		state_register,
-		stack_pointer, // stack is into the area of memory between 0x100 and 0x1ff, starts at 1FF
 		// Index registers
 		x_reg,
 		y_reg,
@@ -34,7 +33,9 @@ unsigned short
 		// Program Counter
 		pc,
 		// VECTORS
-		irq_vect;
+		irq_vect,
+		// stack is into the area of memory between 0x100 and 0x1ff, starts at 1FF
+		stack_pointer;
 int
 		// Cycle counting, for interruptions
 		ic,
@@ -46,7 +47,7 @@ int cycles[256];
 /* Byte Length for every opCode */
 int opByteLength[256];
 
-int ADDRESS,VALUE;
+int ADDRESS,VALUE,LEFT,RIGHT;
 enum instruction_types;
 
 
