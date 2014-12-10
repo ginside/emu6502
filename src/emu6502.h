@@ -24,7 +24,9 @@ void inline opPLP();
 void inline opBranch();
 void inline opBPL();
 void inline opBMI();
+void inline opBVC();
 void inline opPHA();
+void inline opCLI();
 void inline opJMP(byte mem);
 
 /* ADDRESSING MODES FUNCTIONS */

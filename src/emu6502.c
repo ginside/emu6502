@@ -11,7 +11,7 @@
 int main(){
     mem_reset();
     int i = 0x0;
-    for(i; i<=0x4 ; i++) {
+    for(i; i<=0x5 ; i++) {
 		loadTestingProgram(i);
 	}
 
@@ -31,7 +31,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			printf("op code #%x cant have zero byte length..\n", opCode);
 			return;
 		}
-
+4
 		if(cycles[opCode] == 0) {
 			printf("op code #%x cant have zero cycl5es for execution time..\n", opCode);
 			return;
@@ -132,21 +132,21 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x4e: mem_set(adrAbsolute(0, ADDRESS), opLSR(adrAbsolute(0, VALUE))); break; //LSR ADR
 			case 0x4f: break; //NOP
 
-			case 0x50: break; //BVC rel
-			case 0x51: break; //EOR (APZ),Y
+			case 0x50: opBVC(); break; //BVC ADR
+			case 0x51: opEOR(adrIndirectIndexed()); break; //EOR (APZ),Y
 			case 0x52: break; //NOP
 			case 0x53: break; //NOP
 			case 0x54: break; //NOP
-			case 0x55: break; //EOR APZ,X
-			case 0x56: break; //LSR APZ,X
+			case 0x55: opEOR(adrZeroPage(x_reg, VALUE)); break; //EOR APZ,X
+			case 0x56: mem_set(adrZeroPage(x_reg, ADDRESS), opLSR(adrZeroPage(x_reg, VALUE))); break; //LSR APZ,X
 			case 0x57: break; //NOP
-			case 0x58: break; //CLI
-			case 0x59: break; //EOR ADR,Y
+			case 0x58: opCLI(); break; //CLI
+			case 0x59: opEOR(adrAbsolute(y_reg, VALUE)); break; //EOR ADR,Y
 			case 0x5a: break; //NOP
 			case 0x5b: break; //NOP
 			case 0x5c: break; //NOP
-			case 0x5d: break; //EOR ADR,X
-			case 0x5e: break; //LSR ADR,X
+			case 0x5d: opEOR(adrAbsolute(x_reg, VALUE)); break; //EOR ADR,X
+			case 0x5e: mem_set(adrAbsolute(x_reg, ADDRESS), opLSR(adrAbsolute(x_reg, VALUE))); break; break; //LSR ADR,X
 			case 0x5f: break; //NOP
 
 			case 0x60: break; //RTS
@@ -324,11 +324,12 @@ void launchEmulation(int Counter, int opCode, int debug) {
         if(opCode == 255 || Counter == 0) {
             break;
         }
-        if (opCode == 0x10 /*BPL*/
-	  || opCode == 0x20 /*JSR*/
-	  || opCode == 0x30 /*BMI*/
-    || opCode == 0x40 /*RTI*/
-    || opCode == 0x4C /*JMP*/) {
+        if ( opCode == 0x10 /*BPL*/
+      	  || opCode == 0x20 /*JSR*/
+      	  || opCode == 0x30 /*BMI*/
+          || opCode == 0x40 /*RTI*/
+          || opCode == 0x4C /*JMP*/
+          || opCode == 0x50 /*BVC*/) {
 			continue;
 		}
 
@@ -540,15 +541,22 @@ void inline opBPL() {
 }
 
 void inline opBMI() {
-	cpu_showState(0x30);
+	//cpu_showState(0x30);
 	if ((NEGATIVE & state_register) == NEGATIVE) {
 	      opBranch();
 	}
 }
 
+void inline opBVC() {
+  if ((OVERFLOW & state_register) == 0) {
+    opBranch();
+  }
+}
 
+void inline opCLI() {
+  state_register &= ~INTERRUPT;
+}
 /** ADDRESSING MODES */
-
 
 unsigned short adrIndexedIndirect() {
 	byte indirect = Memory[pc+1]+x_reg;
@@ -581,6 +589,7 @@ short unsigned adrZeroPage(byte offset, int mode) {
 	if(mode == ADDRESS) {
 		return adr;
 	}
+  //printf("APZ adr = 0x%x\n",adr);
 	return Memory[adr];
 }
 
@@ -589,6 +598,7 @@ byte adrImmediate() {
 }
 
 short unsigned adrAbsolute(byte offset, int mode) {
+  printf("adr Abs offset = 0x%x\n",offset);
 	if(mode == ADDRESS) {
 		return concat_next_operands() + offset;
 	}

@@ -55,6 +55,8 @@ unsigned short concat_operands(byte lowAdr,byte highAdr){
     return (unsigned short) highAdr*256 + lowAdr;
 }
 unsigned short concat_next_operands() {
+  //printf("low=0x%x\n",Memory[pc+1]);
+  //printf("high=0x%x\n",Memory[pc+2]*256);
 	return (unsigned short) (Memory[pc+2]*256 + Memory[pc+1]);
 }
 /* STACK FUNCTIONS */

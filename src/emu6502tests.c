@@ -415,8 +415,7 @@ void loadTestingProgram(int program_id){
             launchEmulation(6,1,1);
             assert(acc == 0x44); // TEST AND ADR,X
             assert(Memory[0x1234] == 0xA8); // TEST ROL ADR,X
-
-			break;
+            break;
 
         case 4://0x40 to 0x4f
 
@@ -526,40 +525,113 @@ void loadTestingProgram(int program_id){
           assert(acc == 0xAA); // TEST EOR ADR
           assert(Memory[0x3333] == 0x4D); // TEST LSR ADR
           assert((state_register & CARRY) == CARRY); // TEST LSR ADR
-  			break;
+  			  break;
 
         case 5://0x50 to 0x5f
-			break;
+          reinit_emulation();
+          Memory[0x0000] = 0x50; //BVC
+          state_register &= ~OVERFLOW;
+          Memory[0x0001] = 0x10;
+          Memory[0x0002] = 0x00;
+          Memory[0x0010] = 0x51; // EOR (APZ),Y
+          Memory[0x0011] = 0x40;
+          Memory[0x0012] = 0xFF;
+          Memory[0x0040] = 0x22;
+          Memory[0x0041] = 0x22;
+          Memory[0x2264] = 0x44;
+          acc = 0x88;
+          y_reg = 0x42;
+          printLoadedProgram();
+          launchEmulation(3,1,1);
+
+          assert(pc == 0x12); // TEST BVC
+          assert(acc == 0xCC); // TEST EOR (APZ),Y
+
+          reinit_emulation();
+          Memory[0x0000] = 0x55; // EOR APZ,X
+          Memory[0x0001] = 0x05;
+          Memory[0x0002] = 0x56; // LSR APZ,X
+          Memory[0x0003] = 0x08;
+          Memory[0x0004] = 0x58;
+          Memory[0x0005] = 0xFF;
+          Memory[0x000A] = 0x44;
+          Memory[0x000D] = 0x44;
+          acc = 0x88;
+          x_reg = 0x05;
+          state_register |= INTERRUPT;
+
+          printLoadedProgram();
+          launchEmulation(3,1,1);
+
+          assert(acc == 0xCC); // TEST EOR APZ,X
+          assert(Memory[0x000D] == 0x22); // TEST LSR APZ,X
+          assert((state_register & INTERRUPT) == 0); // TEST CLI
+
+          reinit_emulation();
+          Memory[0x0000] = 0x59; //EOR ADR,Y
+          Memory[0x0001] = 0x55;
+          Memory[0x0002] = 0x21;
+          Memory[0x0003] = 0xFF;
+          Memory[0x2157] = 0x81;
+          y_reg = 0x02;
+          acc = 0x44;
+
+          printLoadedProgram();
+          launchEmulation(3,1,1);
+
+          assert(acc == 0xC5);
+
+          reinit_emulation();
+          Memory[0x0000] = 0x5D; //EOR ADR,X
+          Memory[0x0001] = 0x55;
+          Memory[0x0002] = 0x21;
+          Memory[0x0003] = 0x5E; //LSR ADR,X
+          Memory[0x0004] = 0x55;
+          Memory[0x0005] = 0x27;
+          Memory[0x0006] = 0xFF;
+
+          Memory[0x2157] = 0x81;
+          Memory[0x2757] = 0x44;
+          x_reg = 0x02;
+          acc = 0x44;
+
+          printLoadedProgram();
+          launchEmulation(3,1,1);
+
+          assert(acc == 0xC5);
+          assert(Memory[0x2757] == 0x22);
+
+			    break;
 
         case 6://0x60 to 0x6f
-			break;
+			  break;
 
         case 7://0x70 to 0x7f
-			break;
+			  break;
 
         case 8://0x80 to 0x8f
-			break;
+			  break;
 
         case 9://0x90 to 0x9f
-			break;
+			  break;
 
         case 0xA://0xa0 to 0xaf
-			break;
+			  break;
 
         case 0xB://0xb0 to 0xbf
-			break;
+			  break;
 
         case 0xC://0xc0 to 0xcf
-			break;
+			  break;
 
         case 0xD://0xd0 to 0xdf
-			break;
+			  break;
 
         case 0xE://0xe0 to 0xef
-			break;
+			  break;
 
         case 0xF://0xf0 to 0xff
-			break;
+			  break;
     }
 }
 

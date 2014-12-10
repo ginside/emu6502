@@ -1,3 +1,6 @@
+# Compiled stuff
+*.gch
+
 # Object files
 *.o
 *.ko
