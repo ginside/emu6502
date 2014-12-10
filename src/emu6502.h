@@ -8,17 +8,25 @@ typedef unsigned char byte;
 /* OPERATIONS FUNCTIONS */
 byte inline opASL(byte mem);
 void inline opORA(byte mem);
+void inline opEOR(byte mem);
 void inline opBRK();
+void inline opRTI();
 void inline opPHP();
-void inline opBPL();
 void inline opCLC();
+void inline opSEC();
 void inline opJSR();
 void inline opAND(byte mem);
 void inline opBIT(byte mem);
 byte inline opROL(byte mem);
 byte inline opROR(byte mem);
+byte inline opLSR(byte mem);
 void inline opPLP();
 void inline opBranch();
+void inline opBPL();
+void inline opBMI();
+void inline opPHA();
+void inline opJMP(byte mem);
+
 /* ADDRESSING MODES FUNCTIONS */
 short unsigned adrIndexedIndirect();
 short unsigned adrIndirectIndexed();

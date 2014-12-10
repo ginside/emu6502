@@ -50,6 +50,8 @@ void mem_set(unsigned short address, byte value) {
  * Concatenate two operands to form a 16bits word
  */
 unsigned short concat_operands(byte lowAdr,byte highAdr){
+    //printf("low=0x%x\n",lowAdr);
+    //printf("high=0x%x\n",highAdr);
     return (unsigned short) highAdr*256 + lowAdr;
 }
 unsigned short concat_next_operands() {
@@ -61,7 +63,7 @@ unsigned short concat_next_operands() {
  * Push a memory address content in the stack
  */
 void inline stack_push(byte b) {
-	//printf("push %x at 0x%x\n",b,stack_pointer);
+	  printf("push %x at 0x%x\n",b,stack_pointer);
     Memory[stack_pointer] = b;
     stack_pointer -= 1;
     assert(stack_pointer > 0x100);
@@ -72,14 +74,15 @@ void inline stack_push(byte b) {
  */
 byte inline stack_pop() {
     stack_pointer += 1;
-    return Memory[stack_pointer-1];
+    printf("Pop !! 0x%x\n",Memory[stack_pointer]);
+    return Memory[stack_pointer];
 }
 
 /**
  * Prints the stack contents
  */
 void stack_showState() {
-    printf("-- STACK STATE -- \n");
+    printf("-- STACK STATE -- (stack_pointer=0x%x) \n",stack_pointer);
     int i;
     for(i=0x1FF;i >= stack_pointer ; i--)
         printf("$%x  %x \n",i,Memory[i]);
@@ -117,12 +120,14 @@ void reinit_emulation() {
 	pc                  = 0,
 	interrupt_period    = 0,
 	state_register      = 32,
-		
+
 	// stack is into the area of memory between 0x100 and 0x1ff,
 	// starts at 1ff (going downwards)
-	stack_pointer       = 0x1FF, 
+	stack_pointer       = 0x1FF,
 	// Index registers
 	x_reg               = 0,
 	y_reg               = 0;
-	
+  //accumulator
+  acc                 = 0;
+
 }

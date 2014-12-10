@@ -11,13 +11,13 @@
 int main(){
     mem_reset();
     int i = 0x0;
-    for(i; i<=0x2 ; i++) {
+    for(i; i<=0x4 ; i++) {
 		loadTestingProgram(i);
 	}
 
     // MAIN LOOP
 	//launchEmulation(Counter, opCode, debug);
-    
+
     return 1;
 }
 
@@ -31,23 +31,23 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			printf("op code #%x cant have zero byte length..\n", opCode);
 			return;
 		}
-		
+
 		if(cycles[opCode] == 0) {
-			printf("op code #%x cant have zero cycles for execution time..\n", opCode);
+			printf("op code #%x cant have zero cycl5es for execution time..\n", opCode);
 			return;
 		}*/
 
         opCode  =   Memory[pc];
         //Cycles decrementation to handle irqs
         ic      -=  cycles[opCode];
-        
+
 
         printf("PC=0x%x | OPCODE=0x%x | IC=0x%x \n",pc,opCode,ic);
-		
+
 
         switch(opCode)
         {
-			case 0x00: opBRK(); break;//BRK 
+			case 0x00: opBRK(); break;//BRK
 			case 0x01: opORA(adrIndexedIndirect()); break;//ORA (APZ,X) // ACC <- ACC v Mem[Operand1+X_reg]
 			case 0x02: break; //NOP
 			case 0x03: break; //NOP
@@ -61,10 +61,10 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x0b: break; //NOP
 			case 0x0c: break; //NOP
 			case 0x0d: opORA(adrAbsolute(0, VALUE)); break; //ORA ADR
-			case 0x0e: mem_set(adrAbsolute(0, ADDRESS), opASL(adrAbsolute(0, VALUE))); break; //ASL ADR 
+			case 0x0e: mem_set(adrAbsolute(0, ADDRESS), opASL(adrAbsolute(0, VALUE))); break; //ASL ADR
 			case 0x0f: break; //NOP
-			
-			case 0x10: opBPL();break;//BPL  
+
+			case 0x10: opBPL();break;//BPL
 			case 0x11: opORA(adrIndirectIndexed());break; //ORA (APZ),Y
 			case 0x12: break; //NOP
 			case 0x13: break; //NOP
@@ -77,10 +77,10 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x1a: break; //NOP
 			case 0x1b: break; //NOP
 			case 0x1c: break; //NOP
-			case 0x1d: opORA(adrAbsolute(x_reg, VALUE)); break; //ORA ADR,X 
+			case 0x1d: opORA(adrAbsolute(x_reg, VALUE)); break; //ORA ADR,X
 			case 0x1e: mem_set(adrAbsolute(x_reg, ADDRESS), opASL(adrAbsolute(x_reg, VALUE))); break; //ASL ADR,X
 			case 0x1f: break; //NOP
-			
+
 			case 0x20: opJSR(); break; //JSR ADR
 			case 0x21: opAND(adrIndexedIndirect()); break; //AND (APZ,X)
 			case 0x22: break; //NOP
@@ -97,41 +97,41 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x2d: opAND(adrAbsolute(0, VALUE)); break; //AND ADR
 			case 0x2e: mem_set(adrAbsolute(0, ADDRESS), opROL(adrAbsolute(0, VALUE))); break; //ROL ADR
 			case 0x2f: break; //NOP
-			
-			case 0x30: break; //BMI rel
-			case 0x31: break; //AND (APZ),Y
+
+			case 0x30: opBMI(); break; //BMI rel
+			case 0x31: opAND(adrIndirectIndexed()); break; //AND (APZ),Y
 			case 0x32: break; //NOP
 			case 0x33: break; //NOP
 			case 0x34: break; //NOP
-			case 0x35: break; //AND APZ,X
-			case 0x36: break; //ROL APZ,X
+			case 0x35: opAND(adrZeroPage(x_reg, VALUE)); break; //AND APZ,X
+			case 0x36: mem_set(adrZeroPage(x_reg, ADDRESS),opROL(adrZeroPage(x_reg, VALUE))); //ROL APZ,X
 			case 0x37: break; //NOP
-			case 0x38: break; //SEC 
-			case 0x39: break; //AND ADR,Y
+			case 0x38: opSEC(); break; //SEC
+			case 0x39: opAND(adrAbsolute(y_reg, VALUE)); break; //AND ADR,Y
 			case 0x3a: break; //NOP
 			case 0x3b: break; //NOP
 			case 0x3c: break; //NOP
-			case 0x3d: break; //AND ADR,X
-			case 0x3e: break; //ROL ADR,X
+			case 0x3d: opAND(adrAbsolute(x_reg, VALUE)); break; //AND ADR,X
+			case 0x3e: mem_set(adrAbsolute(x_reg, ADDRESS),opROL(adrAbsolute(x_reg, VALUE))); break; //ROL ADR,X
 			case 0x3f: break; //NOP
-			
-			case 0x40: break; //RTI 
-			case 0x41: break; //EOR (APZ,X)
+
+			case 0x40: opRTI(); break; //RTI
+			case 0x41: opEOR(adrIndexedIndirect()); break; //EOR (APZ,X)
 			case 0x42: break; //NOP
 			case 0x43: break; //NOP
 			case 0x44: break; //NOP
-			case 0x45: break; //EOR APZ
-			case 0x46: break; //LSR APZ
+			case 0x45: opEOR(adrZeroPage(0, VALUE)); break; //EOR APZ
+			case 0x46: mem_set(adrZeroPage(0, ADDRESS), opLSR(adrZeroPage(0, VALUE))); break; //LSR APZ
 			case 0x47: break; //NOP
-			case 0x48: break; //PHA 
-			case 0x49: break; //EOR #DON
-			case 0x4a: break; //LSR ACC
+			case 0x48: opPHA(); break; //PHA
+			case 0x49: opEOR(adrImmediate()); break; //EOR #DON
+			case 0x4a: acc = opLSR(acc); break; //LSR ACC
 			case 0x4b: break; //NOP
-			case 0x4c: break; //JMP ADR
-			case 0x4d: break; //EOR ADR
-			case 0x4e: break; //LSR ADR
+			case 0x4c: opJMP(adrAbsolute(0, VALUE)); break; //JMP ADR
+			case 0x4d: opEOR(adrAbsolute(0, VALUE)); break; //EOR ADR
+			case 0x4e: mem_set(adrAbsolute(0, ADDRESS), opLSR(adrAbsolute(0, VALUE))); break; //LSR ADR
 			case 0x4f: break; //NOP
-			
+
 			case 0x50: break; //BVC rel
 			case 0x51: break; //EOR (APZ),Y
 			case 0x52: break; //NOP
@@ -140,7 +140,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x55: break; //EOR APZ,X
 			case 0x56: break; //LSR APZ,X
 			case 0x57: break; //NOP
-			case 0x58: break; //CLI 
+			case 0x58: break; //CLI
 			case 0x59: break; //EOR ADR,Y
 			case 0x5a: break; //NOP
 			case 0x5b: break; //NOP
@@ -148,8 +148,8 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x5d: break; //EOR ADR,X
 			case 0x5e: break; //LSR ADR,X
 			case 0x5f: break; //NOP
-			
-			case 0x60: break; //RTS 
+
+			case 0x60: break; //RTS
 			case 0x61: break; //ADC (APZ,X)
 			case 0x62: break; //NOP
 			case 0x63: break; //NOP
@@ -157,7 +157,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x65: break; //ADC APZ
 			case 0x66: break; //ROR APZ
 			case 0x67: break; //NOP
-			case 0x68: break; //PLA 
+			case 0x68: break; //PLA
 			case 0x69: break; //ADC #DON
 			case 0x6a: break; //ROR ACC
 			case 0x6b: break; //NOP
@@ -165,7 +165,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x6d: break; //ADC ADR
 			case 0x6e: break; //ROR ADR
 			case 0x6f: break; //NOP
-			
+
 			case 0x70: break; //BVS rel
 			case 0x71: break; //ADC (APZ),Y
 			case 0x72: break; //NOP
@@ -174,7 +174,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x75: break; //ADC APZ,X
 			case 0x76: break; //ROR APZ,X
 			case 0x77: break; //NOP
-			case 0x78: break; //SEI 
+			case 0x78: break; //SEI
 			case 0x79: break; //ADC ADR,Y
 			case 0x7a: break; //NOP
 			case 0x7b: break; //NOP
@@ -182,7 +182,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x7d: break; //ADC ADR,X
 			case 0x7e: break; //ROR ADR,X
 			case 0x7f: break; //NOP
-			
+
 			case 0x80: break; //NOP
 			case 0x81: break; //STA (APZ,X)
 			case 0x82: break; //NOP
@@ -191,15 +191,15 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x85: break; //STA APZ
 			case 0x86: break; //STX APZ
 			case 0x87: break; //NOP
-			case 0x88: break; //DEY 
+			case 0x88: break; //DEY
 			case 0x89: break; //NOP
-			case 0x8a: break; //TXA 
+			case 0x8a: break; //TXA
 			case 0x8b: break; //NOP
 			case 0x8c: break; //STY ADR
 			case 0x8d: break; //STA ADR
 			case 0x8e: break; //STX ADR
 			case 0x8f: break; //NOP
-			
+
 			case 0x90: break; //BCC rel
 			case 0x91: break; //STA (APZ),Y
 			case 0x92: break; //NOP
@@ -208,15 +208,15 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x95: break; //STA APZ,X
 			case 0x96: break; //STX APZ,Y
 			case 0x97: break; //NOP
-			case 0x98: break; //TYA 
+			case 0x98: break; //TYA
 			case 0x99: break; //STA ADR,Y
-			case 0x9a: break; //TXS 
+			case 0x9a: break; //TXS
 			case 0x9b: break; //NOP
 			case 0x9c: break; //NOP
 			case 0x9d: break; //STA ADR,X
 			case 0x9e: break; //NOP
 			case 0x9f: break; //NOP
-			
+
 			case 0xa0: break; //LDY #DON
 			case 0xa1: break; //LDA (APZ,X)
 			case 0xa2: break; //LDX #DON
@@ -225,15 +225,15 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0xa5: break; //LDA APZ
 			case 0xa6: break; //LDX APZ
 			case 0xa7: break; //NOP
-			case 0xa8: break; //TAY 
+			case 0xa8: break; //TAY
 			case 0xa9: break; //LDA #DON
-			case 0xaa: break; //TAX 
+			case 0xaa: break; //TAX
 			case 0xab: break; //NOP
 			case 0xac: break; //LDY ADR
 			case 0xad: break; //LDA ADR
 			case 0xae: break; //LDX ADR
 			case 0xaf: break; //NOP
-			
+
 			case 0xb0: break; //BCS rel
 			case 0xb1: break; //LDA (APZ),Y
 			case 0xb2: break; //NOP
@@ -242,15 +242,15 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0xb5: break; //LDA APZ,X
 			case 0xb6: break; //LDX APZ,Y
 			case 0xb7: break; //NOP
-			case 0xb8: break; //CLV 
+			case 0xb8: break; //CLV
 			case 0xb9: break; //LDA ADR,Y
-			case 0xba: break; //TSX 
+			case 0xba: break; //TSX
 			case 0xbb: break; //NOP
 			case 0xbc: break; //LDY ADR,X
 			case 0xbd: break; //LDA ADR,X
 			case 0xbe: break; //LDX ADR,Y
 			case 0xbf: break; //NOP
-			
+
 			case 0xc0: break; //CPY #DON
 			case 0xc1: break; //CMP (APZ,X)
 			case 0xc2: break; //NOP
@@ -259,15 +259,15 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0xc5: break; //CMP APZ
 			case 0xc6: break; //DEC APZ
 			case 0xc7: break; //NOP
-			case 0xc8: break; //INY 
+			case 0xc8: break; //INY
 			case 0xc9: break; //CMP #DON
-			case 0xca: break; //DEX 
+			case 0xca: break; //DEX
 			case 0xcb: break; //NOP
 			case 0xcc: break; //CPY ADR
 			case 0xcd: break; //CMP ADR
 			case 0xce: break; //DEC ADR
 			case 0xcf: break; //NOP
-			
+
 			case 0xd0: break; //BNE rel
 			case 0xd1: break; //CMP (APZ),Y
 			case 0xd2: break; //NOP
@@ -276,7 +276,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0xd5: break; //CMP APZ,X
 			case 0xd6: break; //DEC APZ,X
 			case 0xd7: break; //NOP
-			case 0xd8: break; //CLD 
+			case 0xd8: break; //CLD
 			case 0xd9: break; //CMP ADR,Y
 			case 0xda: break; //NOP
 			case 0xdb: break; //NOP
@@ -284,7 +284,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0xdd: break; //CMP ADR,X
 			case 0xde: break; //DEC ADR,X
 			case 0xdf: break; //NOP
-			
+
 			case 0xe0: break; //CPX #DON
 			case 0xe1: break; //SBC (APZ,X)
 			case 0xe2: break; //NOP
@@ -293,15 +293,15 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0xe5: break; //SBC APZ
 			case 0xe6: break; //INC APZ
 			case 0xe7: break; //NOP
-			case 0xe8: break; //INX 
+			case 0xe8: break; //INX
 			case 0xe9: break; //SBC #DON
-			case 0xea: break; //NOP 
+			case 0xea: break; //NOP
 			case 0xeb: break; //NOP
 			case 0xec: break; //CPX ADR
 			case 0xed: break; //SBC ADR
 			case 0xee: break; //INC ADR
 			case 0xef: break; //NOP
-			
+
 			case 0xf0: break; //BEQ rel
 			case 0xf1: break; //SBC (APZ),Y
 			case 0xf2: break; //NOP
@@ -310,7 +310,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0xf5: break; //SBC APZ,X
 			case 0xf6: break; //INC APZ,X
 			case 0xf7: break; //NOP
-			case 0xf8: break; //SED 
+			case 0xf8: break; //SED
 			case 0xf9: break; //SBC ADR,Y
 			case 0xfa: break; //NOP
 			case 0xfb: break; //NOP
@@ -324,14 +324,18 @@ void launchEmulation(int Counter, int opCode, int debug) {
         if(opCode == 255 || Counter == 0) {
             break;
         }
-        if (opCode == 0x10 /*BPL*/ || opCode == 0x20 /*JSR*/) {
+        if (opCode == 0x10 /*BPL*/
+	  || opCode == 0x20 /*JSR*/
+	  || opCode == 0x30 /*BMI*/
+    || opCode == 0x40 /*RTI*/
+    || opCode == 0x4C /*JMP*/) {
 			continue;
 		}
-		
+
         pc += opByteLength[opCode];
     }
-    
-    
+
+
     if(debug == 1)
     {
         cpu_showState(opCode);
@@ -340,23 +344,31 @@ void launchEmulation(int Counter, int opCode, int debug) {
 }
 
 
-/** 
- * OPERATIONS FUNCTIONS 
+/**
+ * OPERATIONS FUNCTIONS
  */
 
 
 //"OR" memory with accumulator
-void opORA(byte mem) {
+void inline opORA(byte mem) {
 	acc  |= mem;
 	stateReg_checkNZ(acc);
 }
+
+//"AND" memory with accumulator
 void inline opAND(byte mem) {
-	//printf("value AND = 0x%x acc= 0x%x ",value,acc);
+	//printf("value AND = 0x%x acc= 0x%x ",mem,acc);
 	acc &= mem;
 	//printf(" >>> acc = 0x%x",acc);
 	//printf("\n");
 	stateReg_checkNZ(acc);
-};
+}
+
+//"XOR" memory with accumulator
+void inline opEOR(byte mem) {
+  acc ^= mem;
+  stateReg_checkNZ(acc);
+}
 
 byte inline opASL(byte mem) {
 	//printf("value = %x\n",value);
@@ -365,7 +377,7 @@ byte inline opASL(byte mem) {
     if((mem & 128) > 0) {
         state_register |= CARRY;
     }
-    
+
     mem = mem << 1;
 
     if (mem != 0) {
@@ -378,7 +390,6 @@ byte inline opASL(byte mem) {
 }
 
 byte inline opROL(byte mem) {
-	//printf("old_mem_value = 0x%x\n", mem);
 	byte old_carry = (state_register & CARRY),
 		 new_carry = 0;
 	//printf("old_carry = 0x%x\n", old_carry);
@@ -387,13 +398,13 @@ byte inline opROL(byte mem) {
 	}
 	//printf("new_carry = 0x%x\n", new_carry);
 	mem <<= 1;
-	
+
 	if (old_carry) {
 		mem |= CARRY;
 	}
 	state_register &= ~(CARRY);
 	state_register |= new_carry;
-	
+
 	//printf("new_mem_value = 0x%x\n", mem);
 	return mem;
 }
@@ -404,26 +415,54 @@ byte inline opROR(byte mem) {
 	if (mem & CARRY) {
 		new_carry = CARRY;
 	}
-	
+
 	mem >>= 1;
-	
+
+  if (mem == 0) {
+    state_register |= ZERO;
+  }
 	if (old_carry) {
 		mem |= NEGATIVE;
 	}
 	state_register |= new_carry;
-	
+
 	return mem;
 }
 
-void inline opBPL() {
-	if((NEGATIVE & state_register) == 0){
-		opBranch();
-	}
+byte inline opLSR(byte mem) {
+  printf("LSR MEM = 0x%x \n",mem);
+  byte new_carry = 0;
+  if (mem & CARRY) {
+    new_carry = CARRY;
+  }
+
+  mem >>= 1;
+
+  if (mem == 0) {
+    state_register |= ZERO;
+  }
+  state_register &= ~(NEGATIVE);
+  state_register |= new_carry;
+
+  return mem;
 }
 
 void inline opCLC() {
 	state_register &= ~CARRY;
 }
+
+void inline opSEC() {
+  state_register |= CARRY;
+}
+
+void inline opPHA() {
+  stack_push(acc);
+}
+
+void inline opJMP(byte mem) {
+  pc = mem;
+}
+
 void inline opBRK() {
 	state_register |= BREAK;
 	stack_push(state_register);
@@ -432,8 +471,21 @@ void inline opBRK() {
 	pc = irq_vect;
 }
 
+void inline opRTI() {
+  // byte lowAdr = stack_pop();
+  // byte highAdr = stack_pop();
+  // pc = concat_operands(lowAdr,highAdr);
+  printf("RTI\n");
+  printf("pc=0x%x\n",pc);
+  byte lowAdrPc = stack_pop();
+  byte highAdrPc = stack_pop();
+  pc = concat_operands(lowAdrPc,highAdrPc);
+  state_register = stack_pop();
+  printf("pc=0x%x\n",pc);
+}
+
 void inline opPHP() {
-	stack_push(state_register); 
+	stack_push(state_register);
 }
 void inline opPLP() {
 	state_register = stack_pop();
@@ -453,13 +505,14 @@ void inline opBIT(byte mem) {
 }
 
 /**
+ *
  * Generic Branching function
  */
 void inline opBranch() {
 	unsigned short memAdr = pc;
 	if((Memory[pc+1] & 128) > 0)
 	{
-		//printf("Memory[pc+1] & 128) > 0\n");
+		//printf("Memory[pc+1] & 128) > 0\n");-
 		//printf("-pc = 0x%x\n",pc);
 		//printf("-mem invert = 0x%x\n",(Memory[pc+1]^0xff));
 		//TODO Find example to test if this is the right behavior
@@ -467,14 +520,31 @@ void inline opBranch() {
 	} else {
 		pc = pc + Memory[pc+1];
 	}
-	//if branch changes actual page, add 2 cycle, 1 elsewere
+	//if branch changes actual page, add 2 cycle, add 1 cycle elsewere
 	ic -= 1;
 	if((memAdr & 0xff00) != (pc & 0xff00)) {
 		ic -= 1;
 		//printf("ic--2\n");
 	}
+	//printf("pc = 0x%x\n",pc);
 }
 
+/**
+ * Conditional branch
+ */
+
+void inline opBPL() {
+	if((NEGATIVE & state_register) == 0){
+		opBranch();
+	}
+}
+
+void inline opBMI() {
+	cpu_showState(0x30);
+	if ((NEGATIVE & state_register) == NEGATIVE) {
+	      opBranch();
+	}
+}
 
 
 /** ADDRESSING MODES */
@@ -482,12 +552,12 @@ void inline opBranch() {
 
 unsigned short adrIndexedIndirect() {
 	byte indirect = Memory[pc+1]+x_reg;
-	
-	
-	/*printf("Memory[pc+1] = 0x%x x_reg = 0x%x\n",Memory[pc+1], x_reg);
+
+/*
+	printf("Memory[pc+1] = 0x%x x_reg = 0x%x\n",Memory[pc+1], x_reg);
 	printf("Indirect = 0x%x\n",indirect);
-	printf("value = 0x%x\n", concat_operands(Memory[indirect],Memory[indirect+1]));*/
-	
+	printf("value = 0x%x\n", concat_operands(Memory[indirect],Memory[indirect+1]));
+*/
 	return Memory[concat_operands(Memory[indirect],Memory[indirect+1])];
 }
 unsigned short adrIndirectIndexed() {
