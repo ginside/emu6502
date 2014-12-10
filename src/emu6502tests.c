@@ -604,7 +604,33 @@ void loadTestingProgram(int program_id){
 			    break;
 
         case 6://0x60 to 0x6f
-			  break;
+          reinit_emulation();
+          Memory[0x0000] = 0x60; //RTS
+          stack_push(0x22);
+          stack_push(0x41);
+          Memory[0x2242] = 0X58;
+          Memory[0x2243] = 0xFF;
+
+          launchEmulation(3,1,1);
+
+          assert(pc == 0x2243); // TEST RTS
+
+          reinit_emulation();
+          Memory[0x0000] = 0x61; //ADC (APZ,X)
+          Memory[0x0001] = 0x21;
+          Memory[0x0002] = 0xFF;
+          Memory[0x00C9] = 0x22;
+          Memory[0x00CA] = 0x32;
+          Memory[0x3222] = 0x88;
+          x_reg = 0xA8;
+          acc = 0x45;
+          state_register |= CARRY;
+
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+
+          assert(acc == 0xBD);
+          break;
 
         case 7://0x70 to 0x7f
 			  break;

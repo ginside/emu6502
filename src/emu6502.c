@@ -11,7 +11,7 @@
 int main(){
     mem_reset();
     int i = 0x0;
-    for(i; i<=0x5 ; i++) {
+    for(i; i<=0x6 ; i++) {
 		loadTestingProgram(i);
 	}
 
@@ -149,8 +149,8 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x5e: mem_set(adrAbsolute(x_reg, ADDRESS), opLSR(adrAbsolute(x_reg, VALUE))); break; break; //LSR ADR,X
 			case 0x5f: break; //NOP
 
-			case 0x60: break; //RTS
-			case 0x61: break; //ADC (APZ,X)
+			case 0x60: opRTS(); break; //RTS
+			case 0x61: opADC(adrIndexedIndirect()); break; //ADC (APZ,X)
 			case 0x62: break; //NOP
 			case 0x63: break; //NOP
 			case 0x64: break; //NOP
@@ -365,6 +365,21 @@ void inline opAND(byte mem) {
 	stateReg_checkNZ(acc);
 }
 
+//"ADD" memory with accumulator and carry
+void inline opADC(byte mem) {
+  //printf("ADC, acc = 0x%x , mem = 0x%x\n",acc, mem);
+
+  //DECIMAL MODE
+  if ((state_register & DECIMAL) == DECIMAL) {
+
+    return;
+  }
+  //NON DECIMAL MODE
+  byte result = acc + mem + (state_register & CARRY);
+  stateReg_checkNZ(acc);
+}
+
+
 //"XOR" memory with accumulator
 void inline opEOR(byte mem) {
   acc ^= mem;
@@ -485,6 +500,16 @@ void inline opRTI() {
   printf("pc=0x%x\n",pc);
 }
 
+void inline opRTS() {
+  printf("RTS\n");
+  printf("pc=0x%x\n",pc);
+  byte lowAdrPc = stack_pop();
+  byte highAdrPc = stack_pop();
+  pc = concat_operands(lowAdrPc,highAdrPc);
+
+  printf("pc=0x%x\n",pc);
+}
+
 void inline opPHP() {
 	stack_push(state_register);
 }
@@ -561,11 +586,11 @@ void inline opCLI() {
 unsigned short adrIndexedIndirect() {
 	byte indirect = Memory[pc+1]+x_reg;
 
-/*
+
 	printf("Memory[pc+1] = 0x%x x_reg = 0x%x\n",Memory[pc+1], x_reg);
 	printf("Indirect = 0x%x\n",indirect);
 	printf("value = 0x%x\n", concat_operands(Memory[indirect],Memory[indirect+1]));
-*/
+
 	return Memory[concat_operands(Memory[indirect],Memory[indirect+1])];
 }
 unsigned short adrIndirectIndexed() {
