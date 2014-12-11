@@ -154,19 +154,19 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x62: break; //NOP
 			case 0x63: break; //NOP
 			case 0x64: break; //NOP
-			case 0x65: break; //ADC APZ
-			case 0x66: break; //ROR APZ
+			case 0x65: opADC(adrZeroPage(0, VALUE)); break; //ADC APZ
+			case 0x66: mem_set(adrZeroPage(0, ADDRESS), opROR(adrZeroPage(0, VALUE))); break; //ROR APZ
 			case 0x67: break; //NOP
-			case 0x68: break; //PLA
-			case 0x69: break; //ADC #DON
-			case 0x6a: break; //ROR ACC
+			case 0x68: opPLA(); break; //PLA
+			case 0x69: opADC(adrImmediate()); break; //ADC #DON
+			case 0x6a: acc = opROR(acc); break; //ROR ACC
 			case 0x6b: break; //NOP
-			case 0x6c: break; //JMP ind
-			case 0x6d: break; //ADC ADR
-			case 0x6e: break; //ROR ADR
+			case 0x6c: opJMP(adrIndirect()); break; //JMP ind
+			case 0x6d: opADC(adrAbsolute(0, VALUE)); break; //ADC ADR
+			case 0x6e: mem_set(adrAbsolute(0, ADDRESS), opROR(adrAbsolute(0, VALUE))); break; //ROR ADR
 			case 0x6f: break; //NOP
 
-			case 0x70: break; //BVS rel
+			case 0x70: opBVS(); break; //BVS rel
 			case 0x71: break; //ADC (APZ),Y
 			case 0x72: break; //NOP
 			case 0x73: break; //NOP
@@ -328,8 +328,9 @@ void launchEmulation(int Counter, int opCode, int debug) {
       	  || opCode == 0x20 /*JSR*/
       	  || opCode == 0x30 /*BMI*/
           || opCode == 0x40 /*RTI*/
-          || opCode == 0x4C /*JMP*/
-          || opCode == 0x50 /*BVC*/) {
+          || opCode == 0x4C || opCode == 0x6C /*JMP*/
+          || opCode == 0x50 /*BVC*/
+          || opCode == 0x70 /*BVS*/) {
 			continue;
 		}
 
@@ -367,16 +368,49 @@ void inline opAND(byte mem) {
 
 //"ADD" memory with accumulator and carry
 void inline opADC(byte mem) {
-  //printf("ADC, acc = 0x%x , mem = 0x%x\n",acc, mem);
+  unsigned int result = acc + mem + (state_register & CARRY);
 
-  //DECIMAL MODE
-  if ((state_register & DECIMAL) == DECIMAL) {
+  state_register &= ~(NEGATIVE | OVERFLOW | CARRY);
 
-    return;
+  printf("------------------ADC, acc = 0x%x , mem = 0x%x-------------\n",acc, mem);
+  printf("ACC = 0x%x (%d) - MEM = 0x%x (%d)\n",acc,acc,mem,mem);
+
+
+
+  if (state_register & DECIMAL) {
+    printf("DECIMAL MODE\n");
+
+    if (((acc & 0xf) + (mem & 0xf) + ((state_register & CARRY) ? 1 : 0)) > 9){
+      result += 6;
+    }
+
+    stateReg_checkNZ(result); // SET ZERO invalid ?
+    if (!((acc ^ mem) & NEGATIVE) && ((acc ^ result) & NEGATIVE)) {
+      state_register |= OVERFLOW;
+    }
+    if(result > 0x99) {
+      printf("result = %d\n", result);
+      result += 96;
+      state_register |= CARRY;
+    }
+
+
+
+
+  } else {
+    printf("NON DECIMAL MODE\n");
+    stateReg_checkNZ(result);
+    if (!((acc ^ mem) & NEGATIVE) && ((acc ^ result) & NEGATIVE)) {
+      state_register |= OVERFLOW;
+    }
+    if(result > 0xff) {
+      state_register |= CARRY;
+    }
   }
-  //NON DECIMAL MODE
-  byte result = acc + mem + (state_register & CARRY);
-  stateReg_checkNZ(acc);
+  printf("result = %d\n", result);
+
+  acc = (byte) result;
+  printf("------------------END OF ADC           --------------------\n");
 }
 
 
@@ -440,6 +474,7 @@ byte inline opROR(byte mem) {
 	if (old_carry) {
 		mem |= NEGATIVE;
 	}
+  state_register &= ~(CARRY);
 	state_register |= new_carry;
 
 	return mem;
@@ -475,7 +510,11 @@ void inline opPHA() {
   stack_push(acc);
 }
 
-void inline opJMP(byte mem) {
+void inline opPLA() {
+  acc = stack_pop();
+}
+
+void inline opJMP(unsigned short mem) {
   pc = mem;
 }
 
@@ -578,9 +617,21 @@ void inline opBVC() {
   }
 }
 
+
+void inline opBVS() {
+  if (OVERFLOW & state_register) {
+    opBranch();
+  }
+}
+
+/**
+ * State Register management
+ */
+
 void inline opCLI() {
   state_register &= ~INTERRUPT;
 }
+
 /** ADDRESSING MODES */
 
 unsigned short adrIndexedIndirect() {
@@ -621,7 +672,13 @@ short unsigned adrZeroPage(byte offset, int mode) {
 byte adrImmediate() {
 	return Memory[pc+1];
 }
-
+unsigned short adrIndirect() {
+  unsigned short indirectAddress = concat_next_operands();
+  printf("Indirect address = 0x%x \n", indirectAddress);
+  unsigned short operand = concat_operands(Memory[indirectAddress], Memory[indirectAddress+1]);
+  printf("Operand = 0x%x\n",operand);
+  return operand;
+}
 short unsigned adrAbsolute(byte offset, int mode) {
   printf("adr Abs offset = 0x%x\n",offset);
 	if(mode == ADDRESS) {

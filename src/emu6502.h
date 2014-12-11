@@ -27,17 +27,19 @@ void inline opBranch();
 void inline opBPL();
 void inline opBMI();
 void inline opBVC();
+void inline opBVS();
 void inline opPHA();
+void inline opPLA();
 void inline opCLI();
-void inline opJMP(byte mem);
+void inline opJMP(unsigned short mem);
 
 /* ADDRESSING MODES FUNCTIONS */
 short unsigned adrIndexedIndirect();
 short unsigned adrIndirectIndexed();
 short unsigned adrZeroPage(byte offset, int mode);
 byte adrImmediate();
+short unsigned adrIndirect();
 short unsigned adrAbsolute(byte offset, int mode);
-
 /* DEBUG / TESTING FUNCTIONS */
 void loadTestingProgram();
 void launchEmulation(int Counter, int opCode, int debug);

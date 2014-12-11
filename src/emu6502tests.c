@@ -621,19 +621,130 @@ void loadTestingProgram(int program_id){
           Memory[0x0002] = 0xFF;
           Memory[0x00C9] = 0x22;
           Memory[0x00CA] = 0x32;
-          Memory[0x3222] = 0x88;
+          Memory[0x3222] = 0b01100101;
           x_reg = 0xA8;
-          acc = 0x45;
+          acc = 0b01100101;
+          // state_register |= CARRY;
+
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+
+          assert(state_register & OVERFLOW);
+          assert(state_register & NEGATIVE);
+          assert(!(state_register & CARRY));
+          assert(acc == 0xCA);
+
+          reinit_emulation();
+          Memory[0x0000] = 0x61; //ADC DECIMAL (APZ,X)
+          Memory[0x0001] = 0x21;
+          Memory[0x0002] = 0xFF;
+          Memory[0x00C9] = 0x22;
+          Memory[0x00CA] = 0x32;
+          Memory[0x3222] = 0x99;
+          x_reg = 0xA8;
+          acc = 0x22;
+           state_register |= DECIMAL;
+
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+
+          assert(~state_register & OVERFLOW);
+          assert(state_register & NEGATIVE);
+          assert(state_register & CARRY);
+          assert(acc == 0x21);
+
+          reinit_emulation();
+          Memory[0x0000] = 0x65; //ADC APZ
+          Memory[0x0001] = 0x21;
+          Memory[0x0002] = 0xFF;
+          Memory[0x0021] = 0x22;
+          acc = 0x22;
           state_register |= CARRY;
 
           printLoadedProgram();
           launchEmulation(2,1,1);
 
-          assert(acc == 0xBD);
+          assert(~state_register & OVERFLOW);
+          assert(~state_register & NEGATIVE);
+          assert(~state_register & CARRY);
+          assert(acc == 0x45);
+
+          reinit_emulation();
+          Memory[0x0000] = 0x66; //ROR APZ
+          Memory[0x0001] = 0x21;
+          Memory[0x0002] = 0x68; //PLA
+          Memory[0x0003] = 0xFF;
+
+          Memory[0x0021] = 0x76;
+          state_register |= CARRY;
+          stack_push(0xA8);
+
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+
+          assert(~state_register & CARRY);
+          assert(Memory[0x0021] == 0xBB);
+          assert(acc == 0xA8);
+
+          reinit_emulation();
+          Memory[0x0000] = 0x69; //ADC #DON
+          Memory[0x0001] = 0x21;
+          Memory[0x0002] = 0x6A; //ROR ACC
+          Memory[0x0003] = 0xFF;
+          acc = 0x22;
+          state_register |= CARRY;
+
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+
+          assert(~state_register & OVERFLOW);
+          assert(~state_register & NEGATIVE);
+          assert(~state_register & CARRY);
+          assert(acc == 0x22); // TEST ADC + ROR
+
+
+          reinit_emulation();
+          Memory[0x0000] = 0x6C; //JMP ind
+          Memory[0x0001] = 0x21;
+          Memory[0x0002] = 0x5F;
+          Memory[0x0003] = 0xFF;
+          Memory[0x3076] = 0x48;
+          Memory[0x3077] = 0xFF;
+          Memory[0x5F21] = 0x76;
+          Memory[0x5F22] = 0x30;
+
+          printLoadedProgram();
+          launchEmulation(3,1,1);
+
+          assert(pc == 0x3077);
+
+
+          reinit_emulation();
+          Memory[0x0000] = 0x6D; //ADC ADR
+          Memory[0x0001] = 0x21;
+          Memory[0x0002] = 0x6A;
+          Memory[0x0003] = 0x6E; //ROR ADR
+          Memory[0x0004] = 0x21;
+          Memory[0x0005] = 0x6A;
+          Memory[0x0006] = 0xFF;
+          Memory[0x6A21] = 0x44;
+          acc = 0x22;
+          state_register |= CARRY;
+
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+
+          assert(~state_register & OVERFLOW);
+          assert(~state_register & NEGATIVE);
+          assert(~state_register & CARRY);
+          assert(acc == 0x67); // TEST ADC
+          assert(Memory[0x6A21] == 0x22); // TEST ROR
           break;
 
         case 7://0x70 to 0x7f
-			  break;
+          reinit_emulation();
+          Memory[0x0000] = 0x70; //BVS
+  			  break;
 
         case 8://0x80 to 0x8f
 			  break;
