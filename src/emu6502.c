@@ -195,7 +195,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x87:  break; //NOP
 			case 0x88: opDEY(); break; //DEY
 			case 0x89:  break; //NOP
-			case 0x8a:  break; //TXA
+			case 0x8a: opTXA(); break; //TXA
 			case 0x8b:  break; //NOP
 			case 0x8c: opSTY(adrAbsolute(0, ADDRESS)); break; //STY ADR
 			case 0x8d: opSTA(adrAbsolute(0, ADDRESS)); break; //STA ADR
@@ -203,122 +203,122 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0x8f:  break; //NOP
 
 			case 0x90: opBCC(); break; //BCC rel
-			case 0x91:  break; //STA (APZ),Y
-			case 0x92:  break; //NOP
-			case 0x93:  break; //NOP
-			case 0x94:  break; //STY APZ,X
-			case 0x95:  break; //STA APZ,X
-			case 0x96:  break; //STX APZ,Y
-			case 0x97:  break; //NOP
-			case 0x98:  break; //TYA
-			case 0x99:  break; //STA ADR,Y
-			case 0x9a:  break; //TXS
-			case 0x9b:  break; //NOP
-			case 0x9c:  break; //NOP
-			case 0x9d:  break; //STA ADR,X
-			case 0x9e:  break; //NOP
-			case 0x9f:  break; //NOP
+			case 0x91: opSTA(adrIndirectIndexed(ADDRESS)); break; //STA (APZ),Y
+			case 0x92: break; //NOP
+			case 0x93: break; //NOP
+			case 0x94: opSTY(adrZeroPage(x_reg, ADDRESS)); break; //STY APZ,X
+			case 0x95: opSTA(adrZeroPage(x_reg, ADDRESS)); break; //STA APZ,X
+			case 0x96: opSTX(adrZeroPage(y_reg, ADDRESS)); break; //STX APZ,Y
+			case 0x97: break; //NOP
+			case 0x98: break; //TYA
+			case 0x99: opSTA(adrAbsolute(y_reg, ADDRESS)); break; //STA ADR,Y
+			case 0x9a: opTXS(); break; //TXS
+			case 0x9b: break; //NOP
+			case 0x9c: break; //NOP
+			case 0x9d: opSTA(adrAbsolute(x_reg, ADDRESS)); break; //STA ADR,X
+			case 0x9e: break; //NOP
+			case 0x9f: break; //NOP
 
-			case 0xa0:  break; //LDY #DON
-			case 0xa1:  break; //LDA (APZ,X)
-			case 0xa2:  break; //LDX #DON
-			case 0xa3:  break; //NOP
-			case 0xa4:  break; //LDY APZ
-			case 0xa5:  break; //LDA APZ
-			case 0xa6:  break; //LDX APZ
-			case 0xa7:  break; //NOP
-			case 0xa8:  break; //TAY
-			case 0xa9:  break; //LDA #DON
-			case 0xaa:  break; //TAX
-			case 0xab:  break; //NOP
-			case 0xac:  break; //LDY ADR
-			case 0xad:  break; //LDA ADR
-			case 0xae:  break; //LDX ADR
-			case 0xaf:  break; //NOP
+			case 0xa0: opLDY(adrImmediate()); break; //LDY #DON
+			case 0xa1: opLDA(adrIndexedIndirect(VALUE)); break; //LDA (APZ,X)
+			case 0xa2: opLDX(adrImmediate()); break; //LDX #DON
+			case 0xa3: break; //NOP
+			case 0xa4: opLDY(adrZeroPage(0, VALUE)); break; //LDY APZ
+			case 0xa5: opLDA(adrZeroPage(0, VALUE)); break; //LDA APZ
+			case 0xa6: opLDX(adrZeroPage(0, VALUE)); break; //LDX APZ
+			case 0xa7: break; //NOP
+			case 0xa8: opTAY(); break; //TAY
+			case 0xa9: opLDA(adrImmediate()); break; //LDA #DON
+			case 0xaa: opTAX(); break; //TAX
+			case 0xab: break; //NOP
+			case 0xac: opLDY(adrAbsolute(0, VALUE)); break; //LDY ADR
+			case 0xad: opLDA(adrAbsolute(0, VALUE)); break; //LDA ADR
+			case 0xae: opLDX(adrAbsolute(0, VALUE)); break; //LDX ADR
+			case 0xaf: break; //NOP
 
 			case 0xb0: opBCS(); break; //BCS rel
-			case 0xb1:  break; //LDA (APZ),Y
+			case 0xb1: opLDA(adrIndirectIndexed(VALUE)); break; //LDA (APZ),Y
 			case 0xb2:  break; //NOP
 			case 0xb3:  break; //NOP
-			case 0xb4:  break; //LDY APZ,X
-			case 0xb5:  break; //LDA APZ,X
-			case 0xb6:  break; //LDX APZ,Y
+			case 0xb4: opLDY(adrZeroPage(x_reg, VALUE)); break; //LDY APZ,X
+			case 0xb5: opLDA(adrZeroPage(x_reg, VALUE)); break; //LDA APZ,X
+			case 0xb6: opLDX(adrZeroPage(y_reg, VALUE)); break; //LDX APZ,Y
 			case 0xb7:  break; //NOP
 			case 0xb8: opCLV(); break; //CLV
-			case 0xb9:  break; //LDA ADR,Y
-			case 0xba:  break; //TSX
+			case 0xb9: opLDA(adrAbsolute(y_reg, VALUE)); break; //LDA ADR,Y
+			case 0xba: opTXS(); break; //TXS
 			case 0xbb:  break; //NOP
-			case 0xbc:  break; //LDY ADR,X
-			case 0xbd:  break; //LDA ADR,X
-			case 0xbe:  break; //LDX ADR,Y
+			case 0xbc: opLDY(adrAbsolute(x_reg, VALUE)); break; //LDY ADR,X
+			case 0xbd: opLDA(adrAbsolute(x_reg, VALUE)); break; //LDA ADR,X
+			case 0xbe: opLDX(adrAbsolute(y_reg, VALUE)); break; //LDX ADR,Y
 			case 0xbf:  break; //NOP
 
-			case 0xc0:  break; //CPY #DON
-			case 0xc1:  break; //CMP (APZ,X)
+			case 0xc0: opCPY(adrImmediate()); break; //CPY #DON
+			case 0xc1: opCMP(adrIndexedIndirect(VALUE)); break; //CMP (APZ,X)
 			case 0xc2:  break; //NOP
 			case 0xc3:  break; //NOP
-			case 0xc4:  break; //CPY APZ
-			case 0xc5:  break; //CMP APZ
-			case 0xc6:  break; //DEC APZ
+			case 0xc4: opCPY(adrZeroPage(0, VALUE)); break; //CPY APZ
+			case 0xc5: opCMP(adrZeroPage(0, VALUE)); break; //CMP APZ
+			case 0xc6: opDEC(adrZeroPage(0, VALUE)); break; //DEC APZ
 			case 0xc7:  break; //NOP
-			case 0xc8:  break; //INY
-			case 0xc9:  break; //CMP #DON
+			case 0xc8: opINY(); break; //INY
+			case 0xc9: opCMP(adrImmediate()); break; //CMP #DON
 			case 0xca: opDEX(); break; //DEX
 			case 0xcb:  break; //NOP
-			case 0xcc:  break; //CPY ADR
-			case 0xcd:  break; //CMP ADR
-			case 0xce:  break; //DEC ADR
+			case 0xcc: opCPY(adrAbsolute(0, VALUE)); break; //CPY ADR
+			case 0xcd: opCMP(adrAbsolute(0, VALUE)); break; //CMP ADR
+			case 0xce: opDEC(adrAbsolute(0, VALUE)); break; //DEC ADR
 			case 0xcf:  break; //NOP
 
 			case 0xd0: opBNE(); break; //BNE rel
-			case 0xd1:  break; //CMP (APZ),Y
+			case 0xd1: opCMP(adrIndirectIndexed(VALUE)); break; //CMP (APZ),Y
 			case 0xd2:  break; //NOP
 			case 0xd3:  break; //NOP
 			case 0xd4:  break; //NOP
-			case 0xd5:  break; //CMP APZ,X
-			case 0xd6:  break; //DEC APZ,X
+			case 0xd5: opCMP(adrZeroPage(x_reg, VALUE)); break; //CMP APZ,X
+			case 0xd6: opDEC(adrZeroPage(x_reg, VALUE)); break; //DEC APZ,X
 			case 0xd7:  break; //NOP
 			case 0xd8: opCLD(); break; //CLD
-			case 0xd9:  break; //CMP ADR,Y
+			case 0xd9: opCMP(adrAbsolute(x_reg, VALUE)); break; //CMP ADR,Y
 			case 0xda:  break; //NOP
 			case 0xdb:  break; //NOP
 			case 0xdc:  break; //NOP
-			case 0xdd:  break; //CMP ADR,X
-			case 0xde:  break; //DEC ADR,X
+			case 0xdd: opCMP(adrAbsolute(x_reg, VALUE)); break; //CMP ADR,X
+			case 0xde: opDEC(adrAbsolute(x_reg, VALUE)); break; //DEC ADR,X
 			case 0xdf:  break; //NOP
 
-			case 0xe0:  break; //CPX #DON
-			case 0xe1:  break; //SBC (APZ,X)
+			case 0xe0: opCPX(adrImmediate()); break; //CPX #DON
+			case 0xe1: opSBC(adrIndexedIndirect(VALUE)); break; //SBC (APZ,X)
 			case 0xe2:  break; //NOP
 			case 0xe3:  break; //NOP
-			case 0xe4:  break; //CPX APZ
-			case 0xe5:  break; //SBC APZ
-			case 0xe6:  break; //INC APZ
+			case 0xe4: opCPX(adrZeroPage(0, VALUE)); break; //CPX APZ
+			case 0xe5: opSBC(adrZeroPage(0, VALUE)); break; //SBC APZ
+			case 0xe6: mem_set(adrZeroPage(0, ADDRESS), opINC(adrZeroPage(0, VALUE))); break; //INC APZ
 			case 0xe7:  break; //NOP
-			case 0xe8:  break; //INX
-			case 0xe9:  break; //SBC #DON
-			case 0xea:  break; //NOP
+			case 0xe8: opINX(); break; //INX
+			case 0xe9: opSBC(adrImmediate()); break; //SBC #DON
+			case 0xea: opNOP(); break; //NOP
 			case 0xeb:  break; //NOP
-			case 0xec:  break; //CPX ADR
-			case 0xed:  break; //SBC ADR
-			case 0xee:  break; //INC ADR
+			case 0xec: opCPX(adrAbsolute(0, VALUE)); break; //CPX ADR
+			case 0xed: opSBC(adrAbsolute(0, VALUE)); break; //SBC ADR
+			case 0xee: mem_set(adrAbsolute(0, ADDRESS), opINC(adrAbsolute(0, VALUE))); break; //INC ADR
 			case 0xef:  break; //NOP
 
 			case 0xf0: opBEQ(); break; //BEQ rel
-			case 0xf1:  break; //SBC (APZ),Y
+			case 0xf1: opSBC(adrIndirectIndexed(VALUE)); break; //SBC (APZ),Y
 			case 0xf2:  break; //NOP
 			case 0xf3:  break; //NOP
 			case 0xf4:  break; //NOP
-			case 0xf5:  break; //SBC APZ,X
-			case 0xf6:  break; //INC APZ,X
+			case 0xf5: opSBC(adrZeroPage(x_reg, VALUE)); break; //SBC APZ,X
+			case 0xf6: mem_set(adrZeroPage(x_reg, ADDRESS),opINC(adrZeroPage(x_reg, VALUE))); break; //INC APZ,X
 			case 0xf7:  break; //NOP
-			case 0xf8:  break; //SED
-			case 0xf9:  break; //SBC ADR,Y
+			case 0xf8: opSED(); break; //SED
+			case 0xf9: opSBC(adrAbsolute(y_reg, VALUE)); break; //SBC ADR,Y
 			case 0xfa:  break; //NOP
 			case 0xfb:  break; //NOP
 			case 0xfc:  break; //NOP
-			case 0xfd:  break; //SBC ADR,X
-			case 0xfe:  break; //INC ADR,X
+			case 0xfd: opSBC(adrAbsolute(x_reg, VALUE)); break; //SBC ADR,X
+			case 0xfe: mem_set(adrAbsolute(x_reg, ADDRESS),opINC(adrAbsolute(x_reg, VALUE))); break; //INC ADR,X
 			case 0xff:  break; //NOP
         }
 
