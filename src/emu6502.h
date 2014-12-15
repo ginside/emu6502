@@ -64,6 +64,7 @@ void inline opTAX();
 void inline opTAY();
 void inline opTXA();
 void inline opTXS();
+void inline opTSX();
 void inline opTYA();
 
 

@@ -901,22 +901,286 @@ void loadTestingProgram(int program_id){
 
 
 
-          // Memory[0x0000] = 0x81; // STA (APZ,X)
-          // Memory[0x0000] = 0x91; // STA (APZ),Y
-          //
+          reinit_emulation();
+          Memory[0x0000] = 0x81; // STA (APZ,X)
+          Memory[0x0001] = 0x22;
+          Memory[0x0002] = 0x91; // STA (APZ),Y
+          Memory[0x0003] = 0x24;
+          Memory[0x0004] = 0xFF;
+
+          Memory[0x0054] = 0x41;
+          Memory[0x0055] = 0x22;
+          Memory[0x0024] = 0x55;
+          Memory[0x0025] = 0x23;
+          x_reg = 0x32;
+          y_reg = 0x32;
+          acc = 0x99;
+          printLoadedProgram();
+          launchEmulation(3,1,1);
+          assert(Memory[0x2241] == acc); // STA (APZ,X)
+          assert(Memory[0x2387] == acc); // STA (APZ),Y
 
 			  break;
 
-        case 9://0x90 to 0x9f
+        case 9://Loading instructions
+        Memory[0x0000] = 0xA9; // LDA #DON
+        Memory[0x0001] = 0xEE;
+        Memory[0x0002] = 0xA2; // LDX #DON
+        Memory[0x0003] = 0xAB;
+        Memory[0x0004] = 0xA0; // LDY #DON
+        Memory[0x0005] = 0x45;
+        Memory[0x0006] = 0xFF;
+        printLoadedProgram();
+        launchEmulation(3,1,1);
+        assert(acc == 0xEE);
+        assert(x_reg == 0xAB);
+        assert(y_reg == 0x45);
+        reinit_emulation();
+
+        Memory[0x0000] = 0xA4; // LDY APZ
+        Memory[0x0001] = 0xAA;
+        Memory[0x0002] = 0xA5; // LDA APZ
+        Memory[0x0003] = 0xBB;
+        Memory[0x0004] = 0xA6; // LDX APZ
+        Memory[0x0005] = 0xCC;
+        Memory[0x0006] = 0xFF;
+
+        Memory[0x00AA] = 0x31;
+        Memory[0x00BB] = 0x32;
+        Memory[0x00CC] = 0x33;
+
+        printLoadedProgram();
+        launchEmulation(4,1,1);
+        assert(acc == 0x32);
+        assert(x_reg == 0x33);
+        assert(y_reg == 0x31);
+
+        reinit_emulation();
+        Memory[0x0000] = 0xA1; // LDA (APZ,X)
+        Memory[0x0001] = 0xB1;
+        Memory[0x0002] = 0xFF;
+        Memory[0x00D3] = 0x22;
+        Memory[0x00D4] = 0x22;
+        Memory[0x2222] = 0x11;
+        x_reg = 0x22;
+        printLoadedProgram();
+        launchEmulation(2,1,1);
+        assert(acc == 0x11);
+
+        reinit_emulation();
+        Memory[0x0000] = 0xB1; // LDA (APZ),Y
+        Memory[0x0001] = 0xA1;
+        Memory[0x0002] = 0xFF;
+
+        Memory[0x00A1] = 0x33;
+        Memory[0x00A2] = 0x31;
+
+        Memory[0x3165] = 0xBB;
+        y_reg = 0x32;
+        printLoadedProgram();
+        launchEmulation(2,1,1);
+        assert(acc == 0xBB);
+
+        reinit_emulation();
+        Memory[0x0000] = 0xB4; // LDY APZ,X
+        Memory[0x0001] = 0xAA;
+        Memory[0x0002] = 0xB5; // LDA APZ,X
+        Memory[0x0003] = 0xBB;
+        Memory[0x0004] = 0xB6; // LDX APZ,Y
+        Memory[0x0005] = 0xCC;
+        Memory[0x0006] = 0xFF;
+
+        Memory[0x00CB] = 0x22;
+        Memory[0x00DC] = 0x33;
+        Memory[0x00EE] = 0x44;
+        x_reg = 0x21;
+
+        printLoadedProgram();
+        launchEmulation(3,1,1);
+        assert(x_reg == 0x44);
+        assert(acc == 0x33);
+        assert(y_reg == 0x22);
+
+        reinit_emulation();
+        Memory[0x0000] = 0xAC; // LDY ADR
+        Memory[0x0001] = 0x22;
+        Memory[0x0002] = 0x3F;
+        Memory[0x0003] = 0xAD; // LDA ADR
+        Memory[0x0004] = 0x41;
+        Memory[0x0005] = 0x14;
+        Memory[0x0006] = 0xAE; // LDX ADR
+        Memory[0x0007] = 0x25;
+        Memory[0x0008] = 0x52;
+        Memory[0x0009] = 0xFF;
+
+        Memory[0x3F22] = 0x11;
+        Memory[0x1441] = 0x22;
+        Memory[0x5225] = 0x33;
+        printLoadedProgram();
+        launchEmulation(3,1,1);
+        assert(y_reg == 0x11);
+        assert(acc == 0x22);
+        assert(x_reg == 0x33);
+
+        reinit_emulation();
+        Memory[0x0000] = 0xBC; // LDY ADR,X
+        Memory[0x0001] = 0x22;
+        Memory[0x0002] = 0x1D;
+        Memory[0x0003] = 0xBD; // LDA ADR,X
+        Memory[0x0004] = 0xDD;
+        Memory[0x0005] = 0xEE;
+        Memory[0x0006] = 0xBE; // LDX ADR,Y
+        Memory[0x0007] = 0x42;
+        Memory[0x0008] = 0x12;
+        Memory[0x0009] = 0xFF;
+
+        Memory[0x1D54] = 0x11;
+        Memory[0xEF0F] = 0x22;
+        Memory[0x1253] = 0x33;
+        x_reg = 0x32;
+        y_reg = 0x23;
+
+        printLoadedProgram();
+        launchEmulation(3,1,1);
+        assert(y_reg == 0x11);
+        assert(acc == 0x22);
+        assert(x_reg == 0x33);
+
+        reinit_emulation();
+        Memory[0x0000] = 0xB9; // LDA ADR,Y
+        Memory[0x0001] = 0x22;
+        Memory[0x0002] = 0x33;
+        Memory[0x0003] = 0xFF;
+
+        Memory[0x3420] = 0xAA;
+
+        y_reg = 0xFE;
+        printLoadedProgram();
+        launchEmulation(2,1,1);
+        assert(acc == 0xAA);
+
 			  break;
 
-        case 0xA://0xa0 to 0xaf
+        case 0xA://Transfert instructions
+          Memory[0x0000] = 0x98;// TYA impl
+          Memory[0x0001] = 0xAA;// TAX impl
+          Memory[0x0002] = 0xFF;
+          y_reg = 0x11;
+
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert(acc == 0x11);
+          assert(x_reg == 0x11);
+
+          reinit_emulation();
+          Memory[0x0000] = 0x8A;// TXA impl
+          Memory[0x0001] = 0x9A;// TXS impl
+          Memory[0x0002] = 0xFF;
+          x_reg = 0xFE;
+          printLoadedProgram();
+          launchEmulation(3,1,1);
+          assert(acc == 0xFE);
+          assert(stack_pointer == 0x1FE);
+
+          reinit_emulation();
+          Memory[0x0000] = 0xA8;// TAY impl
+          Memory[0x0001] = 0xBA;// TSX impl
+          Memory[0x0002] = 0xFF;
+          acc = 0xAA;
+
+          printLoadedProgram();
+          launchEmulation(3,1,1);
+          assert(y_reg == 0xAA);
+          assert(x_reg == 0xFF);
+
 			  break;
 
-        case 0xB://0xb0 to 0xbf
+        case 0xB://Increment and Decrement functions
+        Memory[0x0000] = 0x88; //DEY impl
+        Memory[0x0001] = 0xCA; //DEX impl
+        Memory[0x0002] = 0xC6; //DEC APZ
+        Memory[0x0003] = 0x21;
+        Memory[0x0004] = 0xD6; //DEC APZ,X
+        Memory[0x0005] = 0x91;
+        Memory[0x0006] = 0xCE; //DEC ADR
+        Memory[0x0007] = 0x11;
+        Memory[0x0008] = 0x21;
+        Memory[0x0009] = 0xDE; //DEC ADR,X
+        Memory[0x000A] = 0x11;
+        Memory[0x000B] = 0x21;
+        Memory[0x000C] = 0xFF;
+
+        Memory[0x0021] = 0x22;
+        Memory[0x00B1] = 0x27;
+        Memory[0x2111] = 0x30;
+        Memory[0x2131] = 0xAA;
+
+        x_reg = 0x21;
+        y_reg = 0x20;
+        printLoadedProgram();
+        launchEmulation(7,1,1);
+
+        assert(y_reg == 0x1F);
+        assert(x_reg == 0x20);
+        assert(Memory[0x0021]  == 0x21);
+        assert(Memory[0x00B1]  == 0x26);
+        assert(Memory[0x2111]  == 0x2F);
+        assert(Memory[0x2131]  == 0xA9);
+
+
+        reinit_emulation();
+        Memory[0x0000] = 0xC8; //INY impl
+        Memory[0x0001] = 0xE8; //INX impl
+        Memory[0x0002] = 0xE6; //INC APZ
+        Memory[0x0003] = 0x22;
+        Memory[0x0004] = 0xF6; //INC APZ,X
+        Memory[0x0005] = 0x32;
+        Memory[0x0006] = 0xEE; //INC ADR
+        Memory[0x0007] = 0x11;
+        Memory[0x0008] = 0xA1;
+        Memory[0x0009] = 0xFE; //INC ADR,X
+        Memory[0x000A] = 0x11;
+        Memory[0x000B] = 0xA1;
+        Memory[0x000C] = 0xFF;
+
+        Memory[0x0022] = 0x22;
+        Memory[0x0054] = 0x27;
+        Memory[0xA111] = 0x30;
+        Memory[0xA133] = 0xAA;
+
+        x_reg = 0x21;
+        y_reg = 0x20;
+        printLoadedProgram();
+        launchEmulation(7,1,1);
+        assert(x_reg == 0x22);
+        assert(y_reg == 0x21);
+        assert(Memory[0x0022] == 0x23);
+        assert(Memory[0x0054] == 0x28);
+        assert(Memory[0xA111] == 0x31);
+        assert(Memory[0xA133] == 0xAB);
+
 			  break;
 
-        case 0xC://0xc0 to 0xcf
+        case 0xC://state_register management operations
+          Memory[0x0000] = 0x78; // SEI impl
+          Memory[0x0001] = 0xB8; // CLV impl
+          Memory[0x0002] = 0xD8; // CLD impl
+          Memory[0x0003] = 0xFF;
+          state_register |= ~INTERRUPT;
+          state_register |= OVERFLOW;
+          state_register |= DECIMAL;
+          printLoadedProgram();
+          launchEmulation(7,1,1);
+          assert(state_register & INTERRUPT);
+          assert(!(state_register & OVERFLOW));
+          assert(!(state_register & DECIMAL));
+
+          reinit_emulation();
+          Memory[0x0000] = 0xF8; // SED impl
+          Memory[0x0001] = 0xFF;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert(state_register & DECIMAL);
 			  break;
 
         case 0xD://0xd0 to 0xdf
@@ -941,6 +1205,8 @@ void printLoadedProgram() {
 
 		if(Memory[i] == 255)
 			break;
+    // else
+    //   printf("Mem at 0x%x : 0x%x\n",i,Memory[i]);
 		printf("|$");
 		if(i<0x10)
 			printf("000");
@@ -954,7 +1220,7 @@ void printLoadedProgram() {
 		printf("%x|",Memory[i]);
 		if(opByteLength[Memory[i]]==1)
 			printf("    |    |");
-		if(opByteLength[Memory[i]]==2)
+		else if(opByteLength[Memory[i]]==2)
 		{
 		   printf("0x");
 		   if(Memory[i+1] < 0x10)
@@ -962,7 +1228,7 @@ void printLoadedProgram() {
 		   printf("%x|    |",Memory[i+1]);
 		   i+=1;
 		}
-		if(opByteLength[Memory[i]]==3)
+		else if(opByteLength[Memory[i]]==3)
 		{
 			if(Memory[i+1] < 0x10)
 			   printf("0");
@@ -971,7 +1237,8 @@ void printLoadedProgram() {
 			   printf("0");
 		   printf("0x%x|",Memory[i+2]);
 			i+=2;
-		}printf("\n");
+		}
+    printf("\n");
 	}
 	printf("+--------------------+\n");
 }
