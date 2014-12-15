@@ -13,7 +13,7 @@
 int main(){
     mem_reset();
     int i = 0x0;
-    for(i; i<=0x6 ; i++) {
+    for(i; i<=0x8 ; i++) {
 		loadTestingProgram(i);
 	}
 
@@ -784,6 +784,7 @@ void inline opSEI() {
 }
 
 void inline opSTA(unsigned short m_address) {
+  // printf("---------------------STA mem address = 0x%x \n",m_address);
   Memory[m_address] = acc;
 }
 void inline opSTX(unsigned short m_address){
