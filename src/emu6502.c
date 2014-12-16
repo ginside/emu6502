@@ -13,7 +13,7 @@
 int main(){
     mem_reset();
     int i = 0x0;
-    for(i; i<=0xC ; i++) {
+    for(i; i<=0xE ; i++) {
 		loadTestingProgram(i);
 	}
 
@@ -281,7 +281,7 @@ void launchEmulation(int Counter, int opCode, int debug) {
 			case 0xd6: mem_set(adrZeroPage(x_reg, ADDRESS), opDEC(adrZeroPage(x_reg, VALUE))); break; //DEC APZ,X
 			case 0xd7: break; //NOP
 			case 0xd8: opCLD(); break; //CLD
-			case 0xd9: opCMP(adrAbsolute(x_reg, VALUE)); break; //CMP ADR,Y
+			case 0xd9: opCMP(adrAbsolute(y_reg, VALUE)); break; //CMP ADR,Y
 			case 0xda: break; //NOP
 			case 0xdb: break; //NOP
 			case 0xdc: break; //NOP
@@ -379,13 +379,14 @@ void inline opBranch() {
 * Generic compare function
 */
 void inline opCompare(byte mem, byte cmp) {
+  printf("cmp = 0x%x, mem = 0x%x\n", cmp, mem);
   state_register &= ~(CARRY | NEGATIVE | ZERO);
   if(cmp > mem) {
     state_register |= CARRY;
   } else if (cmp == mem) {
     state_register |= (CARRY | ZERO);
   }
-  state_register |= (cmp - mem) & NEGATIVE;
+  state_register |= ((cmp - mem) & NEGATIVE);
 }
 
 /**
@@ -828,13 +829,10 @@ void inline opTYA() {
 
 unsigned short adrIndexedIndirect(int mode) {
 	byte indirect = Memory[pc+1]+x_reg;
-
-
 	printf("Memory[pc+1] = 0x%x x_reg = 0x%x\n",Memory[pc+1], x_reg);
 	printf("Indirect = 0x%x\n",indirect);
-	printf("value = 0x%x\n", concat_operands(Memory[indirect],Memory[indirect+1]));
-
   unsigned short indirect_address = concat_operands(Memory[indirect],Memory[indirect+1]);
+  printf("indirect_address = 0x%x\n", indirect_address);
   if(mode == VALUE) {
     return Memory[indirect_address];
   }
