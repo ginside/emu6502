@@ -1235,23 +1235,218 @@ void loadTestingProgram(int program_id){
 
         case 0xE://Compare operations
 
-        Memory[0x0000] = 0xC1; // CMP (APZ,X)
+          Memory[0x0000] = 0xC1; // CMP (APZ,X)
+          Memory[0x0001] = 0x11;
+          Memory[0x0002] = 0xFF;
+          Memory[0x0099] = 0x22;
+          Memory[0x00AA] = 0x22;
+          Memory[0x2222] = 0x45;
+          acc = 0x46;
+          x_reg = 0x88;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert(state_register & CARRY == CARRY);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ~ZERO);
+          assert(state_register & ~NEGATIVE);
+
+          reinit_emulation();
+          Memory[0x0000] = 0xD1; // CMP (APZ),Y
+          Memory[0x0001] = 0x11;
+          Memory[0x0002] = 0xFF;
+          Memory[0x0011] = 0x22;
+          Memory[0x0012] = 0x22;
+          Memory[0x2233] = 0x45;
+          acc = 0xAB;
+          y_reg = 0x11;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert(state_register & CARRY == CARRY);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ~ZERO);
+          assert(state_register & ~NEGATIVE);
+
+          reinit_emulation();
+          Memory[0x0000] = 0xC5; // CMP APZ
+          Memory[0x0001] = 0x11;
+          Memory[0x0002] = 0xFF;
+          Memory[0x0011] = 0x11;
+          acc = 0x05;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert((state_register & CARRY) == 0);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ~ZERO);
+          assert(state_register & NEGATIVE);
+
+          reinit_emulation();
+          Memory[0x0000] = 0xD5; // CMP APZ,X
+          Memory[0x0001] = 0x05;
+          Memory[0x0002] = 0xFF;
+          Memory[0x000A] = 0x05;
+          x_reg = 0x05;
+          acc = 0x05;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert(state_register);
+          assert(state_register & CARRY == CARRY);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ZERO);
+          assert(state_register & ~NEGATIVE);
+          //
+          reinit_emulation();
+          Memory[0x0000] = 0xC9; // CMP #DON
+          Memory[0x0001] = 0x01;
+          Memory[0x0002] = 0xFF;
+          acc = 0x05;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert(state_register & CARRY == CARRY);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ~ZERO);
+          assert(state_register & ~NEGATIVE);
+          //
+          reinit_emulation();
+          Memory[0x0000] = 0xD9; // CMP ADR,Y
+          Memory[0x0001] = 0x04;
+          Memory[0x0002] = 0x01;
+          Memory[0x0003] = 0xFF;
+          Memory[0x0126] = 0x23;
+          y_reg = 0x22;
+          acc = 0x22;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert((state_register & CARRY) == 0);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ~ZERO);
+          assert(state_register & NEGATIVE);
+          //
+          reinit_emulation();
+          Memory[0x0000] = 0xCD; // CMP ADR
+          Memory[0x0001] = 0x04;
+          Memory[0x0002] = 0x01;
+          Memory[0x0003] = 0xFF;
+          Memory[0x0104] = 0x23;
+          acc = 0x22;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert((state_register & CARRY) == 0);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ~ZERO);
+          assert(state_register & NEGATIVE);
+
+          reinit_emulation();
+          Memory[0x0000] = 0xDD; // CMP ADR,X
+          Memory[0x0001] = 0x04;
+          Memory[0x0002] = 0x01;
+          Memory[0x0003] = 0xFF;
+          Memory[0x0105] = 0x23;
+          x_reg = 0x01;
+          acc = 0x22;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert((state_register & CARRY) == 0);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ~ZERO);
+          assert(state_register & NEGATIVE);
+          // //
+          reinit_emulation();
+          Memory[0x0000] = 0xC0; // CPY #DON
+          Memory[0x0001] = 0xAA;
+          Memory[0x0002] = 0xFF;
+          y_reg = 0xAB;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert((state_register & CARRY) == CARRY);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ~ZERO);
+          assert(state_register & ~NEGATIVE);
+          //
+          reinit_emulation();
+          Memory[0x0000] = 0xC4; // CPY APZ
+          Memory[0x0001] = 0xAA;
+          Memory[0x0002] = 0xFF;
+          Memory[0x00AA] = 0xCD;
+          y_reg = 0xAB;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert((state_register & CARRY) == 0);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ~ZERO);
+          assert(state_register & NEGATIVE);
+          //
+          reinit_emulation();
+          Memory[0x0000] = 0xCC; // CPY ADR
+          Memory[0x0001] = 0xCC;
+          Memory[0x0002] = 0xCC;
+          Memory[0x0003] = 0xFF;
+          Memory[0xCCCC] = 0x22;
+          y_reg = 0x22;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert(state_register);
+          assert((state_register & CARRY) == CARRY);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ZERO);
+          assert(state_register & ~NEGATIVE);
+          //
+          reinit_emulation();
+          Memory[0x0000] = 0xE0; // CPX #DON
+          Memory[0x0001] = 0xE0;
+          Memory[0x0002] = 0xFF;
+          x_reg = 0x22;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert((state_register & CARRY) == 0);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ~ZERO);
+          assert(state_register & ~NEGATIVE);
+          //
+          reinit_emulation();
+          Memory[0x0000] = 0xE4; // CPX APZ
+          Memory[0x0001] = 0xAA;
+          Memory[0x0002] = 0xFF;
+          Memory[0x00AA] = 0xCD;
+          x_reg = 0xAB;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert((state_register & CARRY) == 0);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ~ZERO);
+          assert(state_register & NEGATIVE);
+          //
+          reinit_emulation();
+          Memory[0x0000] = 0xEC; // CPX ADR
+          Memory[0x0001] = 0xCC;
+          Memory[0x0002] = 0xCC;
+          Memory[0x0003] = 0xFF;
+          Memory[0xCCCC] = 0x22;
+          x_reg = 0x22;
+          printLoadedProgram();
+          launchEmulation(2,1,1);
+          assert(state_register);
+          assert((state_register & CARRY) == CARRY);
+          assert(state_register & ~OVERFLOW);
+          assert(state_register & ZERO);
+          assert(state_register & ~NEGATIVE);
+  			  break;
+
+        case 0xF://Sub operations
+        Memory[0x0000] = 0xE1; //SBC (APZ,X)
         Memory[0x0001] = 0x11;
         Memory[0x0002] = 0xFF;
-        Memory[0x0099] = 0x22;
-        Memory[0x00AA] = 0x22;
+        Memory[0x0089] = 0x22;
+        Memory[0x008A] = 0x22;
         Memory[0x2222] = 0x45;
-        acc = 0x46;
-        x_reg = 0x88;
+        x_reg = 0x78;
+        acc = 0x79;
         printLoadedProgram();
         launchEmulation(2,1,1);
-        assert(state_register & CARRY == CARRY);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ~ZERO);
-        assert(state_register & ~NEGATIVE);
+        assert(acc == 0x33);
+        assert((state_register & CARRY) == CARRY);
 
         reinit_emulation();
-        Memory[0x0000] = 0xD1; // CMP (APZ),Y
+        Memory[0x0000] = 0xF1; //SBC (APZ),Y
         Memory[0x0001] = 0x11;
         Memory[0x0002] = 0xFF;
         Memory[0x0011] = 0x22;
@@ -1259,182 +1454,13 @@ void loadTestingProgram(int program_id){
         Memory[0x2233] = 0x45;
         acc = 0xAB;
         y_reg = 0x11;
-        printLoadedProgram();
-        launchEmulation(2,1,1);
-        assert(state_register & CARRY == CARRY);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ~ZERO);
-        assert(state_register & ~NEGATIVE);
+        state_register |= CARRY;
 
-        reinit_emulation();
-        Memory[0x0000] = 0xC5; // CMP APZ
-        Memory[0x0001] = 0x11;
-        Memory[0x0002] = 0xFF;
-        Memory[0x0011] = 0x11;
-        acc = 0x05;
         printLoadedProgram();
         launchEmulation(2,1,1);
-        assert((state_register & CARRY) == 0);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ~ZERO);
-        assert(state_register & NEGATIVE);
+        assert(acc == 0x66);
+        assert((state_register & CARRY) == 1);
 
-        reinit_emulation();
-        Memory[0x0000] = 0xD5; // CMP APZ,X
-        Memory[0x0001] = 0x05;
-        Memory[0x0002] = 0xFF;
-        Memory[0x000A] = 0x05;
-        x_reg = 0x05;
-        acc = 0x05;
-        printLoadedProgram();
-        launchEmulation(2,1,1);
-        assert(state_register);
-        assert(state_register & CARRY == CARRY);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ZERO);
-        assert(state_register & ~NEGATIVE);
-        //
-        reinit_emulation();
-        Memory[0x0000] = 0xC9; // CMP #DON
-        Memory[0x0001] = 0x01;
-        Memory[0x0002] = 0xFF;
-        acc = 0x05;
-        printLoadedProgram();
-        launchEmulation(2,1,1);
-        assert(state_register & CARRY == CARRY);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ~ZERO);
-        assert(state_register & ~NEGATIVE);
-        //
-        reinit_emulation();
-        Memory[0x0000] = 0xD9; // CMP ADR,Y
-        Memory[0x0001] = 0x04;
-        Memory[0x0002] = 0x01;
-        Memory[0x0003] = 0xFF;
-        Memory[0x0126] = 0x23;
-        y_reg = 0x22;
-        acc = 0x22;
-        printLoadedProgram();
-        launchEmulation(2,1,1);
-        assert((state_register & CARRY) == 0);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ~ZERO);
-        assert(state_register & NEGATIVE);
-        //
-        reinit_emulation();
-        Memory[0x0000] = 0xCD; // CMP ADR
-        Memory[0x0001] = 0x04;
-        Memory[0x0002] = 0x01;
-        Memory[0x0003] = 0xFF;
-        Memory[0x0104] = 0x23;
-        acc = 0x22;
-        printLoadedProgram();
-        launchEmulation(2,1,1);
-        assert((state_register & CARRY) == 0);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ~ZERO);
-        assert(state_register & NEGATIVE);
-
-        reinit_emulation();
-        Memory[0x0000] = 0xDD; // CMP ADR,X
-        Memory[0x0001] = 0x04;
-        Memory[0x0002] = 0x01;
-        Memory[0x0003] = 0xFF;
-        Memory[0x0105] = 0x23;
-        x_reg = 0x01;
-        acc = 0x22;
-        printLoadedProgram();
-        launchEmulation(2,1,1);
-        assert((state_register & CARRY) == 0);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ~ZERO);
-        assert(state_register & NEGATIVE);
-        // //
-        reinit_emulation();
-        Memory[0x0000] = 0xC0; // CPY #DON
-        Memory[0x0001] = 0xAA;
-        Memory[0x0002] = 0xFF;
-        y_reg = 0xAB;
-        printLoadedProgram();
-        launchEmulation(2,1,1);
-        assert((state_register & CARRY) == CARRY);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ~ZERO);
-        assert(state_register & ~NEGATIVE);
-        //
-        reinit_emulation();
-        Memory[0x0000] = 0xC4; // CPY APZ
-        Memory[0x0001] = 0xAA;
-        Memory[0x0002] = 0xFF;
-        Memory[0x00AA] = 0xCD;
-        y_reg = 0xAB;
-        printLoadedProgram();
-        launchEmulation(2,1,1);
-        assert((state_register & CARRY) == 0);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ~ZERO);
-        assert(state_register & NEGATIVE);
-        //
-        reinit_emulation();
-        Memory[0x0000] = 0xCC; // CPY ADR
-        Memory[0x0001] = 0xCC;
-        Memory[0x0002] = 0xCC;
-        Memory[0x0003] = 0xFF;
-        Memory[0xCCCC] = 0x22;
-        y_reg = 0x22;
-        printLoadedProgram();
-        launchEmulation(2,1,1);
-        assert(state_register);
-        assert((state_register & CARRY) == CARRY);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ZERO);
-        assert(state_register & ~NEGATIVE);
-        //
-        reinit_emulation();
-        Memory[0x0000] = 0xE0; // CPX #DON
-        Memory[0x0001] = 0xE0;
-        Memory[0x0002] = 0xFF;
-        x_reg = 0x22;
-        printLoadedProgram();
-        launchEmulation(2,1,1);
-        assert((state_register & CARRY) == 0);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ~ZERO);
-        assert(state_register & ~NEGATIVE);
-        //
-        reinit_emulation();
-        Memory[0x0000] = 0xE4; // CPX APZ
-        Memory[0x0001] = 0xAA;
-        Memory[0x0002] = 0xFF;
-        Memory[0x00AA] = 0xCD;
-        x_reg = 0xAB;
-        printLoadedProgram();
-        launchEmulation(2,1,1);
-        assert((state_register & CARRY) == 0);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ~ZERO);
-        assert(state_register & NEGATIVE);
-        //
-        reinit_emulation();
-        Memory[0x0000] = 0xEC; // CPX ADR
-        Memory[0x0001] = 0xCC;
-        Memory[0x0002] = 0xCC;
-        Memory[0x0003] = 0xFF;
-        Memory[0xCCCC] = 0x22;
-        x_reg = 0x22;
-        printLoadedProgram();
-        launchEmulation(2,1,1);
-        assert(state_register);
-        assert((state_register & CARRY) == CARRY);
-        assert(state_register & ~OVERFLOW);
-        assert(state_register & ZERO);
-        assert(state_register & ~NEGATIVE);
-
-			  break;
-
-        case 0xF://Sub operations
-        Memory[0x0000] = 0xE0; //SBC (APZ,X)
-        Memory[0x0000] = 0xF0; //SBC (APZ),Y
         Memory[0x0000] = 0xE5; //SBC APZ
         Memory[0x0000] = 0xF5; //SBC APZ,X
         Memory[0x0000] = 0xE9; //SBC #DON
