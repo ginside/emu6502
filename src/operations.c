@@ -3,6 +3,7 @@
 #include "emu6502.h"
 #include "tools.h"
 #include "cpu_variables.h"
+#include "memory.h"
 
 
 /**
@@ -11,7 +12,7 @@
 */
 void inline opBranch() {
   unsigned short memAdr = pc;
-  if((Memory[pc+1] & 128) > 0)
+  if((mem_read(pc+1) & 128) > 0)
   {
     //printf("Memory[pc+1] & 128) > 0\n");-
     //printf("-pc = 0x%x\n",pc);
