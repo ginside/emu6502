@@ -1,25 +1,47 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 #include "emu6502.h"
 #include "operations.h"
 #include "tools.h"
 #include "cpu_variables.h"
 #include "emu6502tests.h"
+#include "cartridge.h"
 
 #include "assert.h"
 
 // MOS-6502 Emulator
 
 
-int main(){
+int main( int argc, char* args[] ){
+    printf("argc = %d\n",argc);
+    printf("argv1 = %s\n", args[1]);
     mem_reset();
-    int i = 0x0;
-    for(i; i<=0xF ; i++) {
-		loadTestingProgram(i);
-	}
+    FILE* cart = fopen(args[1], "r");
+    if(cart == NULL) {
+      char* strerrorstring = strerror(errno);
+      fprintf(stderr, "%s\n", strerrorstring);
+    }
+    byte cart_byte;
+    char buffer[8];
+    int address = 0;
+    while(!feof(cart)) {
+      int i;
+      printf("$%x ", address);
+      for(i = 0; i<16;i+=1) {
+        if(feof(cart)) {
+          break;
+        }
+        cart_byte = fgetc(cart);
+        printf("%02x ", cart_byte);
+      }
+      address += 16;
+      printf("\n");
 
-    // MAIN LOOP
-	//launchEmulation(Counter, opCode, debug);
+    }
+    fclose(cart);
+  //launchEmulation(Counter, opCode, debug);
 
     return 1;
 }
